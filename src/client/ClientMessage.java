@@ -4,42 +4,49 @@ import java.io.Serializable;
 
 public class ClientMessage implements Serializable{
 	
-	static final int norma=0,sendMessage = 1, createQueue = 2, deleteQueue = 3, sendPReciever=4,querySender=5,queryQueue=6,readMessage=7;
+	public static final int norma=0;
+	public static final int sendMessage = 1;
+	public static final int createQueue = 2;
+	public static final int deleteQueue = 3;
+	public static final int sendPReciever=4;
+	public static final int querySender=5;
+	public static final int queryQueue=6;
+	public static final int readMessage=7;
 	public int type;
 	public String message;
 	public Message msg=new Message();
 	public String queueName;
 	
 	// constructor
-	ClientMessage(int type, String message) {
+	public ClientMessage(int type, String message) {
 		this.type = type;
 		this.message = message;
 	}
-	ClientMessage(int type, Message message) {
+	public ClientMessage(int type, Message message) {
 		this.type = type;
 		this.msg = message;
 	}
-	ClientMessage(int type, Message message,String queueName) {
+	public ClientMessage(int type, Message message,String queueName) {
 		this.type = type;
 		this.msg = message;
 		this.queueName=queueName;
 	}
-	ClientMessage(int type) {
+	public ClientMessage(int type) {
 		this.type = type;
 	}
-	ClientMessage(String username){
+	public ClientMessage(String username){
 		this.message=username;
 	}
-	int getType() {
+	public int getType() {
 		return type;
 	}
-	Message getMessage(){
+	public Message getMessage(){
 		return msg;
 	}
-	String getString(){
+	public String getString(){
 		return message;
 	}
-	String getQueueName(){
+	public String getQueueName(){
 		return this.queueName;
 	}
 

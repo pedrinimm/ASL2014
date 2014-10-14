@@ -1,4 +1,4 @@
-package client;
+package server;
 
 import java.io.*;
 import java.net.*;
@@ -7,6 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 
+import client.ClientMessage;
+import client.Message;
+import client.QueueCl;
+import client.ClientMessage;
 
 
 public class Server {
@@ -106,32 +110,8 @@ public class Server {
 	synchronized void deleteClient(int id){
 		mapClients.remove(id);
 	}
-	private synchronized void broadcast(String message) {
-		//String time = sdf.format(new Date());
-		String messageLf = " " + message + "\n";
-		System.out.print(messageLf);
-		ClientMessage mensaje=new ClientMessage(ClientMessage.norma,messageLf);
-		// we loop in reverse order in case we would have to remove a Client
-		// because it has disconnected
-		for(int i=0;i<mapClients.size();i++){
-			ClientThread ct = mapClients.get(i);
-			if(!ct.writeMsg(mensaje)) {
-				mapClients.remove(i);
-				System.out.println("Disconnected Client " + ct.username + " removed from list.");
-			}
-		}
-	}
-	private synchronized void broadcast(Message message) {
 
-		ClientMessage mensaje=new ClientMessage(ClientMessage.sendMessage,message);
-		for(int i=0;i<mapClients.size();i++){
-			ClientThread ct = mapClients.get(i);
-			if(!ct.writeMsg(mensaje)) {
-				mapClients.remove(i);
-				System.out.println("Disconnected Client " + ct.username + " removed from list.");
-			}
-		}
-	}
+
 	private synchronized void sendMessage(int id,ClientMessage msg){
 		
 		ClientThread ct=mapClients.get(id);
@@ -141,17 +121,7 @@ public class Server {
 		}
 		
 	}
-	private synchronized void unicast(String reciever,Message message) {
 
-		ClientMessage mensaje=new ClientMessage(ClientMessage.sendMessage,message);
-		for(int i=0;i<mapClients.size();i++){
-			ClientThread ct = mapClients.get(i);
-			if(!ct.writeMsg(mensaje)) {
-				mapClients.remove(i);
-				System.out.println("Disconnected Client " + ct.username + " removed from list.");
-			}
-		}
-	}
 	public static void main(String[] args) {
 
 		int portNumber = 10033;

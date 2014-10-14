@@ -5,8 +5,8 @@ import java.util.*;
 
 public class QueueCl implements Serializable{
 	
-	UUID queueId;
-	List<Message> messages;
+	public UUID queueId;
+	public List<Message> messages;
 	
 	public QueueCl(){
 		this.queueId=UUID.randomUUID();
@@ -27,7 +27,7 @@ public class QueueCl implements Serializable{
 	public void removeMessage(){
 		this.messages.remove(this.messages.size()-1);
 	}
-	boolean noEmpty(){
+	public boolean noEmpty(){
 		if(this.messages.isEmpty()){
 			return false;
 		}

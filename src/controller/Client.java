@@ -1,8 +1,10 @@
-package client;
+package controller;
 
 import java.net.*;
 import java.io.*;
 import java.util.*;
+
+import client.ClientMessage;
 import client.Message;
 
 public class Client {
