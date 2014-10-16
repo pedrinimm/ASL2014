@@ -13,7 +13,7 @@ import client.QueueCl;
 import client.ClientMessage;
 
 
-public class Server {
+public class Server implements Runnable{
 	
 	private int connectionID;
 	private int port;
@@ -24,40 +24,22 @@ public class Server {
 	
 	//database part
 	private Connection conn;
+	private final DBConnectorServer conDispatch;
 	
 	
 	public Server(int port){
 		this.port=port;
 		QueueCl queue=new QueueCl();
 		this.mapQueue.put("general", queue);
-		
+		conDispatch =new DBConnectorServer();
 		conn=null;
 		
 	}
-	
-	public synchronized void conectDatabase(){
-		try
-	    {
-	      Class.forName("org.postgresql.Driver");
-	      String url = "jdbc:postgresql://localhost/messaging";
-	      conn = DriverManager.getConnection(url,"message", "message");
-	      System.out.println("se conecto");
-	    }
-	    catch (ClassNotFoundException e)
-	    {
-	      e.printStackTrace();
-	      System.exit(1);
-	    }
-	    catch (SQLException e)
-	    {
-	      e.printStackTrace();
-	      System.exit(2);
-	    }
-	}
-	public void start(){
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
 		stopCondition=true;
 		//conecting to database
-		conectDatabase();
 		try{
 			ServerSocket socket=new ServerSocket(port);
 			while(stopCondition){
@@ -144,7 +126,7 @@ public class Server {
 		}
 		// create a server object and start it
 		Server server = new Server(portNumber);
-		server.start();
+		server.run();
 	}
 	class ClientThread extends Thread {
 		Socket socket;
@@ -175,25 +157,7 @@ public class Server {
 			}
 			date = new Date().toString() + "\n";
 		}
-		//check user
-		synchronized void addUser(){
-			try 
-		    {
-		      Statement st = conn.createStatement();
-		      ResultSet rs = st.executeQuery("SELECT * FROM clients WHERE clients.name='"+username+"'");
-		      if(rs.getString("name").equals(username)){
-		    	  System.out.println("User exist");
-		      }else{
-		    	  st.executeQuery("INSERT INTO clients (name) VALUES ('"+username+"');");
-		      }
-		      rs.close();
-		      st.close();
-		    }
-		    catch (SQLException se) {
-		      System.err.println("Threw a SQLException creating the user.");
-		      System.err.println(se.getMessage());
-		    }
-		}
+
 		// what will run forever
 		public void run() {
 			boolean stopCondi=true;
@@ -371,5 +335,12 @@ public class Server {
 		}
 			
 	}
+	public boolean isFull() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	
 	
 }
