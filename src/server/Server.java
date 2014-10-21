@@ -276,7 +276,7 @@ public class Server implements Runnable{
 				q=mapQueue.get(key);
 				for(int i=0;i<q.messages.size();i++){
 					m=q.messages.get(i);
-					if(m.reciever.equals(username)){
+					if(m.reciever.equals(username) && m.reciever!=null){
 						msg=m;
 						q.messages.remove(i);
 						stopping=false;
@@ -298,6 +298,7 @@ public class Server implements Runnable{
 				q=mapQueue.get("general");
 				if (q.noEmpty()) {
 					msg=q.messages.get(0);
+					q.messages.remove(0);
 				}
 			}else{
 				mapQueue.put("general", new QueueCl());

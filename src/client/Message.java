@@ -20,8 +20,8 @@ public class Message implements Serializable{
 	}
 	public Message(String message,String sender){
 		this.message=message;
-		this.sender="";
-		this.reciever=reciever;
+		this.sender=sender;
+		this.reciever="";
 		this.messageID=UUID.randomUUID();
 		long time = System.currentTimeMillis();
 		this.timestamp=new Timestamp(time);
