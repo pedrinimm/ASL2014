@@ -3,11 +3,18 @@ package controller;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
+import database.MonitorDB;
 
 public class Client {
+	
+	public static LoggingSet lg=new LoggingSet(Client.class.getName());
+	public static final Logger logger=lg.getLogger();
 	
 	private ObjectInputStream input;		
 	private ObjectOutputStream output;		
@@ -26,6 +33,7 @@ public class Client {
 			socket = new Socket(server, port);
 		} 
 		catch(Exception ec) {
+			logger.log(Level.SEVERE,"Error connectiong to server:" + ec);
 			System.out.println("Error connectiong to server:" + ec);
 			return false;
 		}
@@ -38,6 +46,7 @@ public class Client {
 			output = new ObjectOutputStream(socket.getOutputStream());
 		}
 		catch (IOException eIO) {
+			logger.log(Level.SEVERE, "Exception creating new Input/output Streams: " + eIO);
 			System.out.println("Exception creating new Input/output Streams: " + eIO);
 			return false;
 		}
@@ -52,6 +61,7 @@ public class Client {
 			
 		}
 		catch (IOException eIO) {
+			logger.log(Level.SEVERE, "Exception doing login : " + eIO);
 			System.out.println("Exception doing login : " + eIO);
 			disconnect();
 			return false;
@@ -63,15 +73,21 @@ public class Client {
 		try { 
 			if(input != null) input.close();
 		}
-		catch(Exception e) {}
+		catch(Exception e) {
+			logger.log(Level.SEVERE, "Exception closing inbut buffer : " + e);
+		}
 		try {
 			if(output != null) output.close();
 		}
-		catch(Exception e) {}
+		catch(Exception e) {
+			logger.log(Level.SEVERE, "Exception closing output buffer : " + e);
+		}
         try{
 			if(socket != null) socket.close();
 		}
-		catch(Exception e) {}
+		catch(Exception e) {
+			logger.log(Level.SEVERE, "Exception closing socket : " + e);
+		}
 		
 	}
 	void sendMessage(String username,String message) {
@@ -81,6 +97,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
@@ -90,6 +107,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
@@ -100,6 +118,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
@@ -109,6 +128,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 		
@@ -119,6 +139,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
@@ -128,6 +149,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
@@ -137,6 +159,7 @@ public class Client {
 			output.writeObject(msg);
 		}
 		catch(IOException e) {
+			logger.log(Level.SEVERE,"Exception writing to server: " + e);
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
@@ -177,7 +200,7 @@ public class Client {
 		while(forever) {
 			System.out.print(">Input the number you want\n "
 					+ "Menu: 1-. Send message 2.Create Queue 3.Delete Queue "
-					+ "4.Send Message Particular Reciever 5.Query Message from Sender "
+					+ "4.Send Message Particular Reciever particular queue 5.Query Message from Sender "
 					+ "6.Query queues with my messages 7.Read message\n\n");
 			// read message from user
 			int option = scan.nextInt();
@@ -280,11 +303,13 @@ public class Client {
 	
 				}
 				catch(IOException e) {
+					logger.log(Level.SEVERE,"Server has close the connection: " + e);
 					System.out.println("Server has close the connection: " + e);
 					break;
 				}
 				// can't happen with a String object but need the catch anyhow
 				catch(ClassNotFoundException e2) {
+					logger.log(Level.SEVERE,"Class not found " + e2);
 				}
 			}
 		}

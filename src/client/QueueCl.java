@@ -5,10 +5,17 @@ import java.util.*;
 
 public class QueueCl implements Serializable{
 	
+	public String name;
 	public UUID queueId;
 	public List<Message> messages;
 	
 	public QueueCl(){
+		this.name="";
+		this.queueId=UUID.randomUUID();
+		this.messages=new LinkedList<Message>();
+	}
+	public QueueCl(String queueName){
+		this.name=queueName;
 		this.queueId=UUID.randomUUID();
 		this.messages=new LinkedList<Message>();
 	}
@@ -23,6 +30,9 @@ public class QueueCl implements Serializable{
 		else{
 			return null;
 		}
+	}
+	public String getName(){
+		return this.name;
 	}
 	public void removeMessage(){
 		this.messages.remove(this.messages.size()-1);

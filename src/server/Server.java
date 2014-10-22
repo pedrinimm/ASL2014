@@ -6,11 +6,15 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import client.ClientMessage;
 import client.Message;
 import client.QueueCl;
 import client.ClientMessage;
+import database.messsage.CreateMessage;
+import database.queue.CreateQueue;
+import database.queue.GetQueue;
 
 
 public class Server implements Runnable{
@@ -21,25 +25,45 @@ public class Server implements Runnable{
 	private Boolean stopCondition;
 	private Hashtable<String,QueueCl>mapQueue=new Hashtable<String,QueueCl>();
 	private SimpleDateFormat sdf;
-	
+	//limit the number of clients per server and db conections
+	private int ClientCapacity;
+	private int ConectionDbCapacity;
+	private ArrayBlockingQueue<Connection> poolOfDBConnections;
 	//database part
 	private Connection conn;
 	private final DBConnectorServer conDispatch;
 	
 	
-	public Server(int port){
+	public Server(int port,int limit){
 		this.port=port;
 		QueueCl queue=new QueueCl();
 		this.mapQueue.put("general", queue);
+		
 		conDispatch =new DBConnectorServer();
-		conn=null;
+		ConectionDbCapacity=limit;
+		ClientCapacity=limit;
+		poolOfDBConnections=new ArrayBlockingQueue<Connection>(ConectionDbCapacity);
+		conDispatch.setupDatabaseConnectionPool("postgres", "squirrel", "localhost", "messaging", 200);
+		try {
+			conn=conDispatch.getDatabaseConnection();
+			if(!conn.isClosed()){
+				System.out.println("conencted!!");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(GetQueue.execute_query("general", this.mapQueue.get("general").queueId.toString(), conn)==-1){
+			CreateQueue.execute_query("general", this.mapQueue.get("general").queueId.toString(), conn);
+		}
 		
 	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		stopCondition=true;
-		//conecting to database
+		conn=conDispatch.getDatabaseConnection();
 		try{
 			ServerSocket socket=new ServerSocket(port);
 			while(stopCondition){
@@ -103,9 +127,14 @@ public class Server implements Runnable{
 		}
 		
 	}
+	
+	public int getNumberOfClients(){
+		return mapQueue.size();
+	}
 
 	public static void main(String[] args) {
-
+		
+		int limit=200;
 		int portNumber = 10033;
 		switch(args.length) {
 			case 1:
@@ -125,7 +154,8 @@ public class Server implements Runnable{
 				
 		}
 		// create a server object and start it
-		Server server = new Server(portNumber);
+		Server server = new Server(portNumber,limit);
+		//server.conDispatch.setupDatabaseConnectionPool("message", "messages", "localhost", "messaging", 200);
 		server.run();
 	}
 	class ClientThread extends Thread {
@@ -137,6 +167,8 @@ public class Server implements Runnable{
 		String username;
 		ClientMessage ms;
 		String date;
+		Connection dbConn;
+		
 		ClientThread(Socket socket,Connection con) {
 			id=connectionID++;
 			this.socket=socket;
@@ -148,6 +180,7 @@ public class Server implements Runnable{
 				message = (ClientMessage) input.readObject();
 				username=message.getString();
 				//addUser();
+				dbConn=con;
 				
 				
 			}catch (IOException e) {
@@ -179,6 +212,8 @@ public class Server implements Runnable{
 					System.out.println("Llego mensaje\n");
 					Message m=ms.getMessage();
 					mapQueue.get("general").insertMessage(m);
+					int queueID=GetQueue.execute_query("general", mapQueue.get("general").queueId.toString(), dbConn);
+					CreateMessage.execute_query(m.sender, m.reciever, m.message, m.messageID.toString(), m.timestamp, queueID, dbConn);
 					answer=new ClientMessage(ClientMessage.sendMessage,"Message sented");
 					sendMessage(this.id,answer);
 
@@ -190,7 +225,9 @@ public class Server implements Runnable{
 						answer=new ClientMessage(ClientMessage.createQueue,"Queue existed before");
 						sendMessage(this.id,answer);
 					}else{
-						mapQueue.put(queueName, new QueueCl());
+						mapQueue.put(queueName, new QueueCl(queueName));
+						QueueCl tempQ=mapQueue.get(queueName);
+						CreateQueue.execute_query(queueName, tempQ.queueId.toString(), dbConn);
 						answer=new ClientMessage(ClientMessage.createQueue,"Queue created");
 						sendMessage(this.id,answer);
 						
@@ -214,12 +251,21 @@ public class Server implements Runnable{
 					String queueName=ms.getQueueName();
 					if(mapQueue.get(queueName)!=null){
 						mapQueue.get(queueName).insertMessage(m2);
+						QueueCl tempQ=mapQueue.get(queueName);
+						int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
+						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID, dbConn);
 						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
 						sendMessage(this.id,answer);
 
 					}else{
-						mapQueue.put(queueName, new QueueCl());
+						mapQueue.put(queueName, new QueueCl(queueName));
 						mapQueue.get(queueName).insertMessage(m2);
+						
+						QueueCl tempQ=mapQueue.get(queueName);
+						CreateQueue.execute_query(queueName, tempQ.queueId.toString(), dbConn);
+						int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
+						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID, dbConn);
+						
 						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
 						sendMessage(this.id,answer);
 					}

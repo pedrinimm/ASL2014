@@ -7,11 +7,17 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import Logging.LoggingSet;
 import client.Message;
 
 public class GetMessage {
-	public final static String QUERY_FETCH_MESSAGE="SELECT * from messages WHERE messageID=?";
+	
+	public static LoggingSet lg=new LoggingSet(GetMessage.class.getName());
+	public static final Logger logger=lg.getLogger();
+	public final static String QUERY_FETCH_MESSAGE="SELECT * from messages WHERE \"messageID\"=?";
 	
 	public static Message execute_query(String messageID,Connection con){
 		PreparedStatement stmn=null;
@@ -21,6 +27,7 @@ public class GetMessage {
 			stmn.setString(1, messageID);
 			ResultSet result=stmn.executeQuery();
 			if(!result.next()){
+				logger.log(Level.SEVERE, "Error during comming back after fetching a message");
 				System.out.println("Something bad during returning id");
 			}
 			msg.message=result.getString("message");
@@ -32,6 +39,7 @@ public class GetMessage {
 				date = sdf.parse(result.getString("timestamp"));
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
+				logger.log(Level.WARNING,"Error parsing timestamp");
 				e.printStackTrace();
 			}
 			java.sql.Timestamp timestamp = new java.sql.Timestamp(date.getTime());
@@ -41,6 +49,7 @@ public class GetMessage {
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			logger.log(Level.WARNING, "Error closing statement"+e);
 			e.printStackTrace();
 		} finally {
 			if(stmn!=null){
@@ -48,6 +57,7 @@ public class GetMessage {
 					stmn.close();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
+					logger.log(Level.WARNING, "Error closing statement"+e);
 					e.printStackTrace();
 				}
 			}
