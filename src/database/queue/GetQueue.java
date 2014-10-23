@@ -17,15 +17,15 @@ public class GetQueue {
 	
 	public static LoggingSet lg=new LoggingSet(GetQueue.class.getName());
 	public static final Logger logger=lg.getLogger();
-	public final static String QUERY_FETCH_QUEUE="SELECT * from queues WHERE name=? AND \"queueID\"=?";
+	public final static String QUERY_FETCH_QUEUE="SELECT * from queues WHERE name=? ";//AND \"queueID\"=?";
 	
-	public static int execute_query(String name,String queueID,Connection con){
+	public static int execute_query(String name,Connection con){
 		PreparedStatement stmn=null;
 		int id=-1;
 		try {
 			stmn=con.prepareStatement(QUERY_FETCH_QUEUE);
 			stmn.setString(1, name);
-			stmn.setString(2, queueID);
+			//stmn.setString(2, queueID);
 			System.out.println(stmn.toString());
 			ResultSet result=stmn.executeQuery();
 			if(result.next()){

@@ -41,7 +41,8 @@ public class MonitorDB {
 			//CreateQueue.execute_query(testQueue.name, testQueue.queueId.toString(), conn);
 			GetAllQueues.execute_query(conn);
 			
-			int queueId=GetQueue.execute_query("general","24081d61-7ae8-4aba-a564-5c50114a3a93", conn);
+			//int queueId=GetQueue.execute_query("general","24081d61-7ae8-4aba-a564-5c50114a3a93", conn);
+			int queueId=GetQueue.execute_query("general", conn);
 			System.out.println("id retruned "+queueId);
 			//CreateMessage.execute_query(testMessage.sender, testMessage.reciever, testMessage.message, testMessage.messageID.toString(),testMessage.timestamp, queueId, conn);
 			testMessage=GetMessage.execute_query("884dab65-fac7-4edd-8daa-297f0689357d", conn);

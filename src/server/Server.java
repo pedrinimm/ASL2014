@@ -7,7 +7,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
 import client.QueueCl;
@@ -19,9 +24,17 @@ import database.queue.GetQueue;
 
 public class Server implements Runnable{
 	
+	
+	public static LoggingSet lg=new LoggingSet(Server.class.getName());
+	public static final Logger logger=lg.getLogger();
+	
 	private int connectionID;
 	private int port;
+	
 	private Hashtable<Integer, ClientThread> mapClients=new Hashtable<Integer,ClientThread>();
+	private LinkedList<ClientThread> clientList;
+	private final ExecutorService poolClients;
+	
 	private Boolean stopCondition;
 	private Hashtable<String,QueueCl>mapQueue=new Hashtable<String,QueueCl>();
 	private SimpleDateFormat sdf;
@@ -34,6 +47,8 @@ public class Server implements Runnable{
 	private final DBConnectorServer conDispatch;
 	
 	
+	
+	
 	public Server(int port,int limit){
 		this.port=port;
 		QueueCl queue=new QueueCl();
@@ -43,22 +58,30 @@ public class Server implements Runnable{
 		ConectionDbCapacity=limit;
 		ClientCapacity=limit;
 		poolOfDBConnections=new ArrayBlockingQueue<Connection>(ConectionDbCapacity);
+		poolClients= Executors.newFixedThreadPool(limit);
 		conDispatch.setupDatabaseConnectionPool("postgres", "squirrel", "localhost", "messaging", 200);
 		try {
 			conn=conDispatch.getDatabaseConnection();
 			if(!conn.isClosed()){
+				logger.log(Level.INFO, "Connection to the database made");
 				System.out.println("conencted!!");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			logger.log(Level.SEVERE, "Error: During getting connection from the database");
 			e.printStackTrace();
 		}
 		
-		if(GetQueue.execute_query("general", this.mapQueue.get("general").queueId.toString(), conn)==-1){
+		if(GetQueue.execute_query("general", conn)==-1){
 			CreateQueue.execute_query("general", this.mapQueue.get("general").queueId.toString(), conn);
+			logger.log(Level.INFO, "General queue created");
 		}
 		
 	}
+	public void acceptinClient(Socket newClient){
+		
+	}
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -69,18 +92,23 @@ public class Server implements Runnable{
 			while(stopCondition){
 				System.out.println("Server waiting for Clients on port " + port + ".");
 				Socket connection= socket.accept();
+				logger.log(Level.INFO, "Connection from client accepted "+connection.getLocalAddress().getHostAddress());
 				if(!stopCondition){
 					break;
 				}
 				ClientThread ct=new ClientThread(connection,conn);
+				poolClients.execute(ct);
+				//
 				System.out.println("Llego aqui\n");
 				mapClients.put(ct.id,ct);
-				ct.start();
+				//ct.run();
 				
 			}
 			try {
+				
 				socket.close();
-				for(int i = 0; i < mapClients.size(); ++i) {
+				poolClients.shutdown();
+				/*for(int i = 0; i < mapClients.size(); ++i) {
 					ClientThread tc = mapClients.get(i);
 					try {
 					tc.input.close();
@@ -89,14 +117,17 @@ public class Server implements Runnable{
 					}
 					catch(IOException ioE) {
 						// not much I can do
+						logger.log(Level.WARNING, "Exception during closing "+ioE);
 					}
-				}
+				}*/
 			}
 			catch(Exception e) {
+				logger.log(Level.SEVERE, "Exception closing the server and clients: " + e);
 				System.out.println("Exception closing the server and clients: " + e);
 			}
 		}catch(IOException e){
 			String msg = sdf.format(new Date()) + " Exception on new ServerSocket: " + e + "\n";
+			logger.log(Level.SEVERE, msg);
 			System.out.println(msg);
 		}
 	}
@@ -108,6 +139,7 @@ public class Server implements Runnable{
 		}
 		catch(Exception e) {
 			// nothing I can really do
+			logger.log(Level.WARNING, "Exception during closing "+e);
 		}
 	}
 	synchronized void deleteQueue(String queueName){
@@ -118,15 +150,7 @@ public class Server implements Runnable{
 	}
 
 
-	private synchronized void sendMessage(int id,ClientMessage msg){
-		
-		ClientThread ct=mapClients.get(id);
-		if(!ct.writeMsg(msg)) {
-			mapClients.remove(id);
-			System.out.println("Disconnected Client " + ct.username + " removed from list.");
-		}
-		
-	}
+	
 	
 	public int getNumberOfClients(){
 		return mapQueue.size();
@@ -143,6 +167,7 @@ public class Server implements Runnable{
 				}
 				catch(Exception e) {
 					System.out.println("Invalid port number.");
+					logger.log(Level.INFO, "Invalid port number.");
 					System.out.println("Usage is: > java Server [portNumber]");
 					return;
 				}
@@ -158,7 +183,7 @@ public class Server implements Runnable{
 		//server.conDispatch.setupDatabaseConnectionPool("message", "messages", "localhost", "messaging", 200);
 		server.run();
 	}
-	class ClientThread extends Thread {
+	class ClientThread implements Runnable {
 		Socket socket;
 		ObjectInputStream input;
 		ObjectOutputStream output;
@@ -212,7 +237,8 @@ public class Server implements Runnable{
 					System.out.println("Llego mensaje\n");
 					Message m=ms.getMessage();
 					mapQueue.get("general").insertMessage(m);
-					int queueID=GetQueue.execute_query("general", mapQueue.get("general").queueId.toString(), dbConn);
+					//int queueID=GetQueue.execute_query("general", mapQueue.get("general").queueId.toString(), dbConn);
+					int queueID=GetQueue.execute_query("general", dbConn);
 					CreateMessage.execute_query(m.sender, m.reciever, m.message, m.messageID.toString(), m.timestamp, queueID, dbConn);
 					answer=new ClientMessage(ClientMessage.sendMessage,"Message sented");
 					sendMessage(this.id,answer);
@@ -252,7 +278,8 @@ public class Server implements Runnable{
 					if(mapQueue.get(queueName)!=null){
 						mapQueue.get(queueName).insertMessage(m2);
 						QueueCl tempQ=mapQueue.get(queueName);
-						int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
+						//int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
+						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
 						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID, dbConn);
 						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
 						sendMessage(this.id,answer);
@@ -263,7 +290,8 @@ public class Server implements Runnable{
 						
 						QueueCl tempQ=mapQueue.get(queueName);
 						CreateQueue.execute_query(queueName, tempQ.queueId.toString(), dbConn);
-						int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
+						//int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
+						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
 						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID, dbConn);
 						
 						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
@@ -287,6 +315,16 @@ public class Server implements Runnable{
 			}
 			deleteClient(id);
 			close();
+		}
+		private synchronized void sendMessage(int id,ClientMessage msg){
+			
+			if(!writeMsg(msg)) {
+				//mapClients.remove(id);
+				close();
+				logger.log(Level.INFO, "Disconnected Client " + this.username + " removed from list.");
+				System.out.println("Disconnected Client " + this.username + " removed from list.");
+			}
+			
 		}
 		private Message findMessageBySender(String username){
 			Message msg=new Message();
@@ -384,6 +422,9 @@ public class Server implements Runnable{
 	}
 	public boolean isFull() {
 		// TODO Auto-generated method stub
+		if(mapClients.size()>=ClientCapacity){
+			return true;
+		}
 		return false;
 	}
 
