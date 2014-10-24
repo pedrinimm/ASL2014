@@ -14,11 +14,11 @@ import database.client.CreateClient;
 public class CreateMessage {
 	public static LoggingSet lg=new LoggingSet(CreateMessage.class.getName());
 	public static final Logger logger=lg.getLogger();
-	public final static String QUERY_INSERT_MESSAGE="INSERT INTO messages (sender,reciever,message,\"messageID\",timestamp,\"queueID\") "
+	public final static String QUERY_INSERT_MESSAGE="INSERT INTO messages (sender,reciever,message,\"messageID\",timestamp,\"queueID\",\"clientID\") "
 			+ "VALUES (?,?,?,?,?,?) returning id ";
 	
 	public static void execute_query(String sender,String reciever,String message,String messageID,Timestamp timestamp
-			,int queueID,Connection con){
+			,int queueID,int clientID,Connection con){
 		PreparedStatement stmn=null;
 		
 		try {

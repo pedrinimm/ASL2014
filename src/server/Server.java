@@ -17,6 +17,8 @@ import client.ClientMessage;
 import client.Message;
 import client.QueueCl;
 import client.ClientMessage;
+import database.client.CreateClient;
+import database.client.GetClient;
 import database.messsage.CreateMessage;
 import database.queue.CreateQueue;
 import database.queue.GetQueue;
@@ -99,7 +101,7 @@ public class Server implements Runnable{
 				ClientThread ct=new ClientThread(connection,conn);
 				poolClients.execute(ct);
 				//
-				System.out.println("Llego aqui\n");
+				//System.out.println("Llego aqui\n");
 				mapClients.put(ct.id,ct);
 				//ct.run();
 				
@@ -204,11 +206,16 @@ public class Server implements Runnable{
 				input  = new ObjectInputStream(socket.getInputStream());
 				message = (ClientMessage) input.readObject();
 				username=message.getString();
+				
 				//addUser();
 				dbConn=con;
-				
+				int clientId=GetClient.execute_query(username, dbConn);
+				if(clientId==-1){
+					CreateClient.execute_query(username, dbConn);
+				}
 				
 			}catch (IOException e) {
+				logger.log(Level.SEVERE, "Error drung construction of client handler"+e);
 				return;
 			}
 			catch (ClassNotFoundException e) {
@@ -225,10 +232,12 @@ public class Server implements Runnable{
 					ms = (ClientMessage) input.readObject();
 				}
 				catch (IOException e) {
+					logger.log(Level.SEVERE, username + " Exception reading Streams: " + e);
 					System.out.println(username + " Exception reading Streams: " + e);
 					break;				
 				}
 				catch(ClassNotFoundException e2) {
+					logger.log(Level.SEVERE, ""+e2);
 					System.out.println(e2);
 					break;
 				}
@@ -239,7 +248,8 @@ public class Server implements Runnable{
 					mapQueue.get("general").insertMessage(m);
 					//int queueID=GetQueue.execute_query("general", mapQueue.get("general").queueId.toString(), dbConn);
 					int queueID=GetQueue.execute_query("general", dbConn);
-					CreateMessage.execute_query(m.sender, m.reciever, m.message, m.messageID.toString(), m.timestamp, queueID, dbConn);
+					int clientID=GetClient.execute_query(m.sender, dbConn);
+					CreateMessage.execute_query(m.sender, m.reciever, m.message, m.messageID.toString(), m.timestamp, queueID,clientID, dbConn);
 					answer=new ClientMessage(ClientMessage.sendMessage,"Message sented");
 					sendMessage(this.id,answer);
 
@@ -261,7 +271,12 @@ public class Server implements Runnable{
 				}else if(ms.getType()==3){
 					System.out.println("Borrar queue\n");
 					String queueName=ms.getString();
-					if(mapQueue.get(queueName)!=null){
+					if(queueName.equals("general")){
+						QueueCl temp =mapQueue.get(queueName);
+						temp.messages.clear();
+						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted");
+						sendMessage(this.id,answer);
+					}else if(mapQueue.get(queueName)!=null){
 						mapQueue.remove(queueName);
 						System.out.println("Queue removed");
 						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted");
@@ -280,7 +295,8 @@ public class Server implements Runnable{
 						QueueCl tempQ=mapQueue.get(queueName);
 						//int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
 						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
-						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID, dbConn);
+						int clientID=GetClient.execute_query(m2.sender, dbConn);
+						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID,clientID, dbConn);
 						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
 						sendMessage(this.id,answer);
 
@@ -292,7 +308,8 @@ public class Server implements Runnable{
 						CreateQueue.execute_query(queueName, tempQ.queueId.toString(), dbConn);
 						//int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
 						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
-						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID, dbConn);
+						int clientID=GetClient.execute_query(m2.sender, dbConn);
+						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID,clientID, dbConn);
 						
 						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
 						sendMessage(this.id,answer);

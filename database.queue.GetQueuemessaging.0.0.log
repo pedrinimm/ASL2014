@@ -1,0 +1,4 @@
+Oct 23, 2014 1:53:49 AM database.queue.GetQueue execute_query
+WARNING: Error during comming back after getting a queue
+Oct 24, 2014 1:58:32 PM database.client.GetClient execute_query
+WARNING: Error during comming back after getting a clients

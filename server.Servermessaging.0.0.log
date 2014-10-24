@@ -1,0 +1,12 @@
+Oct 23, 2014 1:53:49 AM server.Server <init>
+INFO: Connection to the database made
+Oct 23, 2014 1:53:49 AM server.Server <init>
+INFO: General queue created
+Oct 23, 2014 2:01:06 AM server.Server <init>
+INFO: Connection to the database made
+Oct 24, 2014 1:58:15 PM server.Server <init>
+INFO: Connection to the database made
+Oct 24, 2014 1:58:32 PM server.Server run
+INFO: Connection from client accepted 127.0.0.1
+Oct 24, 2014 2:07:48 PM server.Server$ClientThread run
+SEVERE: Perro Exception reading Streams: java.io.EOFException

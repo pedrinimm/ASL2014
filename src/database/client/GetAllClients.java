@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
 import java.util.UUID;
 
 import client.Message;
@@ -13,20 +14,26 @@ import client.Message;
 public class GetAllClients {
 
 	public final static String QUERY_FETCH_CLIENTS="SELECT * from clients";
+	public static LinkedList<String> clientName;
 	
-	public static void execute_query(Connection con){
+	public static LinkedList<String> execute_query(Connection con){
+		clientName=new LinkedList<String>();
 		PreparedStatement stmn=null;
-		Message msg=new Message();
+		String name="";
 		try {
 			stmn=con.prepareStatement(QUERY_FETCH_CLIENTS);
 			ResultSet result=stmn.executeQuery();
-			if(result.next()){
-				msg.message=result.getString("id");
-				msg.sender=result.getString("name");
-			}else{
-				System.out.println("Something bad during returning id");
+			while(result.next()){
+				if(result.next()){
+					//msg.message=result.getString("id");
+					name=result.getString("name");
+					clientName.add(name);
+				}else{
+					System.out.println("Something bad during returning id");
+				}
 			}
 			
+			return clientName;
 			
 			
 			
@@ -43,6 +50,6 @@ public class GetAllClients {
 				}
 			}
 		}
-		
+		return null;
 	}
 }

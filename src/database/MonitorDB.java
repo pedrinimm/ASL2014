@@ -2,6 +2,7 @@ package database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +49,12 @@ public class MonitorDB {
 			testMessage=GetMessage.execute_query("884dab65-fac7-4edd-8daa-297f0689357d", conn);
 			System.out.println("timestamp "+testMessage.timestamp);
 			GetAllMessages.execute_query(conn);
-			GetAllClients.execute_query(conn);
+			LinkedList<String> clientName=new LinkedList<String>();
+			clientName=GetAllClients.execute_query(conn);
+			for(String nameClie : clientName){
+				System.out.println("client "+nameClie);
+			}
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
