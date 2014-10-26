@@ -52,6 +52,7 @@ public class Server implements Runnable{
 	
 	
 	public Server(int port,int limit){
+		
 		this.port=port;
 		QueueCl queue=new QueueCl();
 		this.mapQueue.put("general", queue);
@@ -59,6 +60,7 @@ public class Server implements Runnable{
 		conDispatch =new DBConnectorServer();
 		ConectionDbCapacity=limit;
 		ClientCapacity=limit;
+		
 		poolOfDBConnections=new ArrayBlockingQueue<Connection>(ConectionDbCapacity);
 		poolClients= Executors.newFixedThreadPool(limit);
 		conDispatch.setupDatabaseConnectionPool("postgres", "squirrel", "localhost", "messaging", 200);

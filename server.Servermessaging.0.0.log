@@ -10,3 +10,13 @@ Oct 24, 2014 1:58:32 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
 Oct 24, 2014 2:07:48 PM server.Server$ClientThread run
 SEVERE: Perro Exception reading Streams: java.io.EOFException
+Oct 26, 2014 1:42:05 PM server.Server <init>
+INFO: Connection to the database made
+Oct 26, 2014 1:59:05 PM server.Server <init>
+INFO: Connection to the database made
+Oct 26, 2014 2:09:43 PM server.Server <init>
+INFO: Connection to the database made
+Oct 26, 2014 2:55:45 PM server.Server <init>
+INFO: Connection to the database made
+Oct 26, 2014 4:42:43 PM server.Server <init>
+INFO: Connection to the database made

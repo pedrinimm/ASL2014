@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" output="classes" path="src"/>
 	<classpathentry kind="var" path="JRE_LIB" sourcepath="JRE_SRC"/>
-	<classpathentry kind="lib" path="lib/postgresql-9.3-1102.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/postgresql-9.3-1102.jdbc4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

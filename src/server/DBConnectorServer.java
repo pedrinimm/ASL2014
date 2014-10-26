@@ -20,6 +20,7 @@ public class DBConnectorServer {
 	private final PGPoolingDataSource connectionPool;
 
     public DBConnectorServer() {
+    	
         connectionPool = new PGPoolingDataSource();
     }
 
@@ -37,6 +38,7 @@ public class DBConnectorServer {
     public Connection getDatabaseConnection() {
         Connection con;
 		try {
+			
 			con = connectionPool.getConnection();
 			
 			con.setAutoCommit(true);

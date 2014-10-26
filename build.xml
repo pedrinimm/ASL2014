@@ -1,49 +1,74 @@
 <project name="Messaging" default="dist" basedir=".">
+	
     <description>
         System
     </description>
-  <!-- set global properties for this build -->
-  <property name="src" location="src"/>
-  <property name="build" location="build"/>
-  <property name="dist"  location="dist"/>
+  	<!-- set global properties for this build -->
+  	<property name="src" location="src"/>
+  	<property name="build" location="build"/>
+  	<property name="dist"  location="dist"/>
 	<property name="lib"  location="lib"/>
 	<property name="db"  location="db"/>
-	
+	<property name="jar"  location="jar"/>
+
 	<!--
 	    Create a classpath container which can be later used in the ant task
 	  -->
-  <path id="build.classpath">
+  	<path id="build.classpath">
 	    <fileset dir="${lib}">
-	      <include name="**/*.jar" />
+	    	<include name="lib/postgresql-9.3-1102.jdbc4.jar"/>
+	      	<include name="**/*.jar" />
 	    </fileset>
-  </path>
+  	</path>
 
-  <target name="init">
-    <!-- Create the time stamp -->
-    <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
-  </target>
+  	<target name="init">
+    	<!-- Create the time stamp -->
+    	<tstamp/>
+    	<!-- Create the build directory structure used by compile -->
+    	<mkdir dir="${build}"/>
+  	</target>
 
-  <target name="compile" depends="init"
-        description="compile the source " >
-    <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}" classpathref="build.classpath"/>
-  </target>
+	<target name="compile" depends="init" description="compile the source " >
+    	<!-- Compile the java code from ${src} into ${build} -->
+    	<javac srcdir="${src}" destdir="${build}" classpathref="build.classpath" includeantruntime="false">
+    		<classpath>
+    			<fileset dir="${lib}">
+    				    	<include name="postgresql-9.3-1102.jdbc4.jar"/>
+    				      	<include name="**/*.jar" />
+    			</fileset>
+    		    <path id="postgresql" location="${lib.dir}/postgresql-9.3-1102.jdbc4.jar"/>
+    		</classpath>
+    	</javac>
+	</target>
 
-  <target name="dist" depends="compile"
-        description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
+  	<target name="dist" depends="compile" description="generate the distribution" >
+    	<!-- Create the distribution directory -->
+    	<mkdir dir="${dist}/lib"/>
+    	<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+  		<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
+    	<jar jarfile="${dist}/lib/MyMessaging-mpedro-${DSTAMP}.jar" basedir="${build}">
+    		<manifest>
+    			
+    			<attribute name="Class-Path" value="lib/postgresql-9.3-1102.jdbc4.jar" />
+    		</manifest>
+    		<zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+  		</jar>
+  	</target>
+	
+	<target name="jar" depends="compile">
+		<mkdir dir="${dist}/jar"/>
+	    <jar destfile="${dist}/jar/${ant.project.name}.jar" basedir="${build}">
+	        <manifest>
+	            
+	        </manifest>
+	        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+	    </jar>
 
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/lib/MyMessaging-mpedro-${DSTAMP}.jar" basedir="${build}"/>
-  </target>
+	</target>
 
-  <target name="clean"
-        description="clean up" >
-    <!-- Delete the ${build} and ${dist} directory trees -->
-    <delete dir="${build}"/>
-    <delete dir="${dist}"/>
-  </target>
+  	<target name="clean" description="clean up" >
+    	<!-- Delete the ${build} and ${dist} directory trees -->
+    	<delete dir="${build}"/>
+    	<delete dir="${dist}"/>
+  	</target>
 </project>
