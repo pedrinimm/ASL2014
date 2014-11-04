@@ -15,7 +15,7 @@ public class CreateMessage {
 	public static LoggingSet lg=new LoggingSet(CreateMessage.class.getName());
 	public static final Logger logger=lg.getLogger();
 	public final static String QUERY_INSERT_MESSAGE="INSERT INTO messages (sender,reciever,message,\"messageID\",timestamp,\"queueID\",\"clientID\") "
-			+ "VALUES (?,?,?,?,?,?) returning id ";
+			+ "VALUES (?,?,?,?,?,?,?) returning id ";
 	
 	public static void execute_query(String sender,String reciever,String message,String messageID,Timestamp timestamp
 			,int queueID,int clientID,Connection con){
@@ -29,6 +29,7 @@ public class CreateMessage {
 			stmn.setString(4, messageID);
 			stmn.setTimestamp(5, timestamp);
 			stmn.setInt(6, queueID);
+			stmn.setInt(7, clientID);
 			ResultSet result=stmn.executeQuery();
 			if(!result.next()){
 				logger.log(Level.SEVERE, "Error during comming back after reating a message");

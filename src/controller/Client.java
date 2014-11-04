@@ -172,6 +172,8 @@ public class Client {
 		switch(args.length) {
 			case 3:
 				serverAddress = args[2];
+				portNumber= Integer.parseInt(args[1]);
+				userName=args[0];
 			case 2:
 				try {
 					portNumber = Integer.parseInt(args[1]);

@@ -15,6 +15,8 @@
 	    Create a classpath container which can be later used in the ant task
 	  -->
   	<path id="build.classpath">
+  		 <pathelement location="classes"/>
+  		 <pathelement location="lib/postgresql-9.3-1102.jdbc4.jar"/>
 	    <fileset dir="${lib}">
 	    	<include name="lib/postgresql-9.3-1102.jdbc4.jar"/>
 	      	<include name="**/*.jar" />
@@ -42,24 +44,30 @@
 	</target>
 
   	<target name="dist" depends="compile" description="generate the distribution" >
+    	<manifestclasspath property="jar.classpath" jarfile="${dist}/lib/MyMessaging-mpedro-${DSTAMP}.jar">
+    		    <classpath refid="build.classpath"/>
+    	</manifestclasspath>
     	<!-- Create the distribution directory -->
     	<mkdir dir="${dist}/lib"/>
     	<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
   		<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
     	<jar jarfile="${dist}/lib/MyMessaging-mpedro-${DSTAMP}.jar" basedir="${build}">
     		<manifest>
-    			
-    			<attribute name="Class-Path" value="lib/postgresql-9.3-1102.jdbc4.jar" />
+    			<attribute name="Class-Path" value="${jar.classpath}" />
     		</manifest>
     		<zipgroupfileset dir="${lib}" includes="**/*.jar"/>
   		</jar>
   	</target>
 	
 	<target name="jar" depends="compile">
+  		<manifestclasspath property="jar.classpath" jarfile="${dist}/jar/${ant.project.name}.jar">
+  			     <classpath refid="build.classpath"/>
+  		</manifestclasspath>	
 		<mkdir dir="${dist}/jar"/>
+		<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
 	    <jar destfile="${dist}/jar/${ant.project.name}.jar" basedir="${build}">
 	        <manifest>
-	            
+	    		<attribute name="Class-Path" value="${jar.classpath}" />
 	        </manifest>
 	        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
 	    </jar>
