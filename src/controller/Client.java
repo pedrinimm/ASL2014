@@ -174,6 +174,7 @@ public class Client {
 				serverAddress = args[2];
 				portNumber= Integer.parseInt(args[1]);
 				userName=args[0];
+				break;
 			case 2:
 				try {
 					portNumber = Integer.parseInt(args[1]);
@@ -183,8 +184,10 @@ public class Client {
 					System.out.println("Usage is: > java Client [username] [portNumber] [serverAddress]");
 					return;
 				}
+				break;
 			case 1: 
 				userName = args[0];
+				break;
 			case 0:
 				break;
 			default:

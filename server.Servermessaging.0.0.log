@@ -52,3 +52,9 @@ Nov 04, 2014 11:27:17 AM server.Server run
 INFO: Connection from client accepted 127.0.0.1
 Nov 04, 2014 11:27:27 AM server.Server run
 INFO: Connection from client accepted 127.0.0.1
+Nov 04, 2014 5:36:53 PM server.Server <init>
+INFO: Connection to the database made
+Nov 04, 2014 5:38:19 PM server.Server <init>
+INFO: Connection to the database made
+Nov 04, 2014 5:41:47 PM server.Server <init>
+INFO: Connection to the database made

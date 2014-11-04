@@ -51,7 +51,7 @@ public class Server implements Runnable{
 	
 	
 	
-	public Server(int port,int limit){
+	public Server(int port,int limit,String hostDB){
 		
 		this.port=port;
 		QueueCl queue=new QueueCl();
@@ -63,23 +63,28 @@ public class Server implements Runnable{
 		
 		poolOfDBConnections=new ArrayBlockingQueue<Connection>(ConectionDbCapacity);
 		poolClients= Executors.newFixedThreadPool(limit);
-		conDispatch.setupDatabaseConnectionPool("postgres", "squirrel", "localhost", "messaging", 200);
+		conDispatch.setupDatabaseConnectionPool("postgres", "squirrel", hostDB, "messaging", ConectionDbCapacity);
 		try {
 			conn=conDispatch.getDatabaseConnection();
 			if(!conn.isClosed()){
 				logger.log(Level.INFO, "Connection to the database made");
 				System.out.println("conencted!!");
+				int queueID_temp=GetQueue.execute_query("general", conn);
+				if(queueID_temp==-1){
+					CreateQueue.execute_query("general", this.mapQueue.get("general").queueId.toString(), conn);
+					System.out.println("General queue created");
+					logger.log(Level.INFO, "General queue created");
+				}else{
+					System.out.println("Queue in database "+queueID_temp);
+				}
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.SEVERE, "Error: During getting connection from the database");
 			e.printStackTrace();
 		}
+		//System.out.println("LLego aqui"+ port);
 		
-		if(GetQueue.execute_query("general", conn)==-1){
-			CreateQueue.execute_query("general", this.mapQueue.get("general").queueId.toString(), conn);
-			logger.log(Level.INFO, "General queue created");
-		}
 		
 	}
 	public void acceptinClient(Socket newClient){
@@ -89,10 +94,14 @@ public class Server implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		//System.out.println("LLego aqui");
 		stopCondition=true;
 		conn=conDispatch.getDatabaseConnection();
+		
 		try{
-			ServerSocket socket=new ServerSocket(port);
+			//System.out.println("LLego aqui"+ this.port);
+			ServerSocket socket=new ServerSocket(this.port);
+			
 			while(stopCondition){
 				System.out.println("Server waiting for Clients on port " + port + ".");
 				Socket connection= socket.accept();
@@ -164,7 +173,16 @@ public class Server implements Runnable{
 		
 		int limit=200;
 		int portNumber = 10033;
+		String hostDB="localhost";
 		switch(args.length) {
+			case 3:
+				limit = Integer.parseInt(args[0]);
+				portNumber= Integer.parseInt(args[1]);
+				hostDB=args[2];
+				System.out.println(limit);
+				System.out.println(portNumber);
+				System.out.println(hostDB);
+				break;
 			case 1:
 				try {
 					portNumber = Integer.parseInt(args[0]);
@@ -175,6 +193,7 @@ public class Server implements Runnable{
 					System.out.println("Usage is: > java Server [portNumber]");
 					return;
 				}
+				break;
 			case 0:
 				break;
 			default:
@@ -183,7 +202,7 @@ public class Server implements Runnable{
 				
 		}
 		// create a server object and start it
-		Server server = new Server(portNumber,limit);
+		Server server = new Server(portNumber,limit,hostDB);
 		//server.conDispatch.setupDatabaseConnectionPool("message", "messages", "localhost", "messaging", 200);
 		server.run();
 	}

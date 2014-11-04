@@ -1,0 +1,2 @@
+Nov 04, 2014 5:53:48 PM server.DBConnectorServer getDatabaseConnection
+SEVERE: error getting conection from connection pool org.postgresql.util.PSQLException: FATAL: no pg_hba.conf entry for host "10.2.131.48", user "postgres", database "messaging", SSL off
