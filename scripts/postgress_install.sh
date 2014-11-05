@@ -8,7 +8,10 @@ sudo dpkg-reconfigure locales
 
 sudo apt-get update
 #install java
-sudo apt-get install default-jdk
+#sudo apt-get install default-jdk
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
 
 #install postgress
 sudo apt-get install postgresql-client

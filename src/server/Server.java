@@ -106,9 +106,9 @@ public class Server implements Runnable{
 		conn=conDispatch.getDatabaseConnection();
 		
 		try{
-			System.out.println("LLego aqui"+ this.port);
+			System.out.println("LLego aqui "+ this.port);
 			ServerSocket socket=new ServerSocket(this.port);
-			
+			//System.out.println("LLego aqui"+ this.port);
 			while(stopCondition){
 				System.out.println("Server waiting for Clients on port " + port + ".");
 				Socket connection= socket.accept();

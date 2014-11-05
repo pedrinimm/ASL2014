@@ -7,7 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Date;
 
-import controller.Client_B.ServerListener;
+
 import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
@@ -210,7 +210,7 @@ public class Client_A {
 		}
 		
 		// wait for messages from user
-		Scanner scan = new Scanner(System.in);
+		//Scanner scan = new Scanner(System.in);
 		boolean forever=true;
 		
 		//while for 30 min
@@ -228,23 +228,36 @@ public class Client_A {
 			}
 			if(option==1){
 				String text="";
-				InputStream in = Client_A.class.getResourceAsStream("message_A.txt");
-				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				text="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho "
+						+"tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco "
+						+"y galgo corredor. Una olla de algo más vaca que carnero, salpicón las más noches, "
+						+"duelos y quebrantos los sábados, lentejas los viernes, algún palomino de añadidura "
+						+"los domingos, consumían las tres partes de su hacienda. El resto della concluían "
+						+"sayo de velarte, calzas de velludo para las fiestas con sus pantuflos de lo mismo, "
+						+"los días de entre semana se honraba con su vellori de lo más fino. Tenía en su casa "
+						+"una ama que pasaba de los cuarenta, y una sobrina que no llegaba a los veinte, y "
+						+"un mozo de campo y plaza, que así ensillaba el rocín como tomaba la podadera. "
+						+"Frisaba la edad de nuestro hidalgo con los cincuenta años, era de complexión recia," 
+						+"seco de carnes, enjuto de rostro; gran madrugador y amigo de la caza. Quieren "
+						+"decir que tenía el sobrenombre de Quijada o Quesada (que en esto hay alguna "
+						+"diferencia en los";
+				Message mns=new Message(text,username);
+				ClientMessage msg=new ClientMessage(ClientMessage.sendMessage,mns);
+				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
+				client.sendMessage(msg);
+				/*//InputStream in = Client_A.class.getClassLoader().getResourceAsStream("message_A.txt");
+				//BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			    try {
-			        StringBuilder sb = new StringBuilder();
-			        String line;
+			        //StringBuilder sb = new StringBuilder();
+			        //String line;
 					try {
-						line = br.readLine();
-						while (line != null) {
-				            sb.append(line);
-				            sb.append("\n");
-				            line = br.readLine();
-				        }
-				        text=sb.toString();
-				        Message mns=new Message(text,username);
-						ClientMessage msg=new ClientMessage(ClientMessage.sendMessage,mns);
-						log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-						client.sendMessage(msg);
+						//line = br.readLine();
+						//while (line != null) {
+				           // sb.append(line);
+				           // sb.append("\n");
+				           // line = br.readLine();
+				        //}
+				        
 						//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
 						//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
 							//System.out.println(client.myServer.getMessageUUID());
@@ -257,57 +270,40 @@ public class Client_A {
 			        
 			    } finally {
 			        try {
-						br.close();
+						//br.close();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-			    }
+			    }*/
 		
 			}else if(option==4){
 				String text="";
-				String reciever="";
-				String queueName="";
-				InputStream in = Client_A.class.getResourceAsStream("message_A.txt");
-				BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			    try {
-			        StringBuilder sb = new StringBuilder();
-			        String line;
-					try {
-						line = br.readLine();
-						while (line != null) {
-				            sb.append(line);
-				            sb.append("\n");
-				            line = br.readLine();
-				        }
-				        text=sb.toString();
-				        reciever=recieverName.getRandomrecieverName().toString();
-				        queueName=queueNameEnum.getRandomQueueName().toString();
-				        
-				        Message msg2=new Message(text,username,reciever);
-						ClientMessage msg=new ClientMessage(ClientMessage.sendPReciever,msg2,queueName);
-				        log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-						//Message msg2=new Message(text,username,reciever);
-						client.sendMsgQueue(msg);
-						//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
-						//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
-							//System.out.println(client.myServer.getMessageUUID());
-						//}
-						
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+				text="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho "
+						+"tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco "
+						+"y galgo corredor. Una olla de algo más vaca que carnero, salpicón las más noches, "
+						+"duelos y quebrantos los sábados, lentejas los viernes, algún palomino de añadidura "
+						+"los domingos, consumían las tres partes de su hacienda. El resto della concluían "
+						+"sayo de velarte, calzas de velludo para las fiestas con sus pantuflos de lo mismo, "
+						+"los días de entre semana se honraba con su vellori de lo más fino. Tenía en su casa "
+						+"una ama que pasaba de los cuarenta, y una sobrina que no llegaba a los veinte, y "
+						+"un mozo de campo y plaza, que así ensillaba el rocín como tomaba la podadera. "
+						+"Frisaba la edad de nuestro hidalgo con los cincuenta años, era de complexión recia," 
+						+"seco de carnes, enjuto de rostro; gran madrugador y amigo de la caza. Quieren "
+						+"decir que tenía el sobrenombre de Quijada o Quesada (que en esto hay alguna "
+						+"diferencia en los";
+					String reciever="";
+					String queueName="";
+					reciever=recieverName.getRandomrecieverName().toString();
+			        queueName=queueNameEnum.getRandomQueueName().toString();
 			        
-			    } finally {
-			        try {
-						br.close();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			    }				
+			        Message msg2=new Message(text,username,reciever);
+					ClientMessage msg=new ClientMessage(ClientMessage.sendPReciever,msg2,queueName);
+			        log_mes.log(Level.INFO,"\t"+ClientMessage.sendPReciever+"\t"+new Date().getTime());
+					//Message msg2=new Message(text,username,reciever);
+					client.sendMsgQueue(msg);
+								
+							
 				
 			}
 		}
