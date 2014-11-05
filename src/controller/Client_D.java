@@ -12,12 +12,12 @@ import client.ClientMessage;
 import client.Message;
 import database.MonitorDB;
 
-public class Client {
+public class Client_D {
 	
-	public static LoggingSet lg=new LoggingSet(Client.class.getName());
+	public static LoggingSet lg=new LoggingSet(Client_D.class.getName());
 	public static final Logger logger=lg.getLogger();
 	//--for measuring reasons 
-	public static LoggingSet l_measure=new LoggingSet(Client.class.getName()+"-tracing-");
+	public static LoggingSet l_measure=new LoggingSet(Client_D.class.getName()+"-tracing-");
 	public static final Logger log_mes=l_measure.getLogger();
 	//---end
 	private ObjectInputStream input;		
@@ -27,7 +27,7 @@ public class Client {
 	private static String server, username;
 	private int port;
 	
-	Client(String server, int port, String username) {
+	Client_D(String server, int port, String username) {
 		//log_mes.setUseParentHandlers(false);
 		this.server = server;
 		this.port = port;
@@ -201,7 +201,7 @@ public class Client {
 				System.out.println("Usage is: > java Client [username] [portNumber] {serverAddress]");
 			return;
 		}
-		Client client = new Client(serverAddress, portNumber, userName);
+		Client_D client = new Client_D(serverAddress, portNumber, userName);
 		if(!client.start()){
 			return;
 		}
@@ -288,11 +288,10 @@ public class Client {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
 				client.getMsgSender(sender);
 			}else if(option==6){
 				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.readMessageAnyqueue(username);
+				client.readMessageAnyqueue(username);;
 			}
 			else if(option==7){
 				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());

@@ -1,4 +1,0 @@
-Nov 04, 2014 11:23:29 AM controller.Client$ServerListener run
-SEVERE: Server has close the connection: java.io.EOFException
-Nov 04, 2014 11:29:49 AM controller.Client$ServerListener run
-SEVERE: Server has close the connection: java.io.EOFException

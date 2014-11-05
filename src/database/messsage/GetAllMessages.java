@@ -36,7 +36,7 @@ public class GetAllMessages {
 					java.sql.Timestamp timestamp = new java.sql.Timestamp(date.getTime());
 					msg.timestamp=timestamp;
 					msg.messageID=UUID.fromString(result.getString("messageID"));
-					System.out.println("message id  "+msg.messageID+" sender "+msg.sender);
+					//System.out.println("message id  "+msg.messageID+" sender "+msg.sender);
 				}
 			}else{
 				System.out.println("Something bad during returning id");

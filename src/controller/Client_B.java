@@ -7,31 +7,34 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Date;
 
+
 import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
 import database.MonitorDB;
 
-public class Client {
+public class Client_B {
 	
-	public static LoggingSet lg=new LoggingSet(Client.class.getName());
+	public static LoggingSet lg=new LoggingSet(Client_B.class.getName());
 	public static final Logger logger=lg.getLogger();
 	//--for measuring reasons 
-	public static LoggingSet l_measure=new LoggingSet(Client.class.getName()+"-tracing-");
+	public static LoggingSet l_measure=new LoggingSet(Client_B.class.getName()+"-tracing-");
 	public static final Logger log_mes=l_measure.getLogger();
 	//---end
 	private ObjectInputStream input;		
 	private ObjectOutputStream output;		
 	private Socket socket;
 	
+	private ServerListener myServer;
 	private static String server, username;
 	private int port;
 	
-	Client(String server, int port, String username) {
+	Client_B(String server, int port, String username) {
 		//log_mes.setUseParentHandlers(false);
 		this.server = server;
 		this.port = port;
 		this.username = username;
+		this.myServer=new ServerListener();
 	}
 	public boolean start(){
 		try {
@@ -59,7 +62,8 @@ public class Client {
 		}
 
 		// creates the Thread to listen from the server 
-		new ServerListener().start();
+		//ServerListener myServer=new ServerListener();
+		myServer.start();
 		// Send our username to the server this is the only message that we
 		// will send as a String. All other messages will be ChatMessage objects
 		try
@@ -140,8 +144,8 @@ public class Client {
 		}
 		
 	}
-	public void getMsgSender(String sender){
-		ClientMessage msg=new ClientMessage(ClientMessage.querySender,sender);
+	public void getMsgSender(ClientMessage sender){
+		ClientMessage msg=sender;
 		try {
 			output.writeObject(msg);
 		}
@@ -150,8 +154,8 @@ public class Client {
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
-	public void readMessage(String myswlf){
-		ClientMessage msg=new ClientMessage(ClientMessage.readMessage,myswlf);
+	public void readMessage(ClientMessage myswlf){
+		ClientMessage msg=myswlf;
 		try {
 			output.writeObject(msg);
 		}
@@ -160,8 +164,8 @@ public class Client {
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
-	public void readMessageAnyqueue(String myswlf){
-		ClientMessage msg=new ClientMessage(ClientMessage.queryQueue,myswlf);
+	public void readMessageAnyqueue(ClientMessage myswlf){
+		ClientMessage msg=myswlf;
 		try {
 			output.writeObject(msg);
 		}
@@ -201,7 +205,7 @@ public class Client {
 				System.out.println("Usage is: > java Client [username] [portNumber] {serverAddress]");
 			return;
 		}
-		Client client = new Client(serverAddress, portNumber, userName);
+		Client_B client = new Client_B(serverAddress, portNumber, userName);
 		if(!client.start()){
 			return;
 		}
@@ -210,111 +214,112 @@ public class Client {
 		Scanner scan = new Scanner(System.in);
 		boolean forever=true;
 		
-		while(forever) {
-			System.out.print(">Input the number you want\n "
-					+ "Menu: 1-. Send message 2.Create Queue 3.Delete Queue "
-					+ "4.Send Message Particular Reciever particular queue 5.Query Message from Sender "
-					+ "6.Query queues with my messages 7.Read message\n\n");
-			// read message from user
-			int option = scan.nextInt();
-			// logout if message is LOGOUT
-			System.out.println("El numero es "+option);
+		//while for 30 min
+		long start = System.currentTimeMillis();
+		long end = start + 60*1000;
+		long half = start + 60*500;
+		while(System.currentTimeMillis() < end){
+			//get sending option
+			String option=requestOption.getRandomRequestOption().toString();
+			//
 			
+			if(option.equals("A")){
+				String sender=recieverName.getRandomrecieverName().toString();
+				log_mes.log(Level.INFO,"\t"+ClientMessage.querySender+"\t"+new Date().getTime());
+				ClientMessage msg=new ClientMessage(ClientMessage.querySender,sender);
+				client.getMsgSender(msg);
+				//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+				//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
+					//System.out.println(client.myServer.getMessageUUID());
+				//}
+				//System.out.println("I moved on "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+			}
+			if(option.equals("B")){
+				log_mes.log(Level.INFO,"\t"+ClientMessage.queryQueue+"\t"+new Date().getTime());
+				ClientMessage msg=new ClientMessage(ClientMessage.queryQueue,username);
+				client.readMessageAnyqueue(msg);
+				//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+				//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
+					//System.out.println(client.myServer.getMessageUUID());
+				//}
+				//System.out.println("I moved on "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+			}
+			if(option.equals("C")){
+				log_mes.log(Level.INFO,"\t"+ClientMessage.readMessage+"\t"+new Date().getTime());
+				ClientMessage msg=new ClientMessage(ClientMessage.readMessage,username);
+				client.readMessage(msg);
+				//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+				//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
+					//System.out.println(client.myServer.getMessageUUID());
+				//}
+				//System.out.println("I moved on "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+			}
 			
-			if(option==1){
-				System.out.println("Tipe the message:");
-				BufferedReader br = new BufferedReader( new InputStreamReader(System.in));
-				String text="";
-				try {
-					text = br.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				//String text=scan.nextLine();
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.sendMessage(username,text);
-		
-			}else if(option==2){
-				System.out.println("Tipe the queue name:");
-				BufferedReader br = new BufferedReader( new InputStreamReader(System.in));
-				String text="";
-				try {
-					text = br.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.createQueue(text);
-			}else if(option==3){
-				System.out.println("Tipe the queue name:");
-				BufferedReader br = new BufferedReader( new InputStreamReader(System.in));
-				String text="";
-				try {
-					text = br.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.deleteQueue(text);
-			}else if(option==4){
-				System.out.println("Tipe the message:");
-				BufferedReader br = new BufferedReader( new InputStreamReader(System.in));
-				String text="";
-				String reciever="";
-				String queueName="";
-				try {
-					text = br.readLine();
-					System.out.println("Tipe reciever:");
-					reciever=br.readLine();
-					System.out.println("Tipe queue name:");
-					queueName=br.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}					
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				//Message msg2=new Message(text,username,reciever);
-				client.sendMsgQueue(reciever, queueName, text, username);
-			}else if(option==5){
-				System.out.println("Tipe the sender name:");
-				BufferedReader br = new BufferedReader( new InputStreamReader(System.in));
-				String sender="";
-				try {
-					sender = br.readLine();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.getMsgSender(sender);
-			}else if(option==6){
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.readMessageAnyqueue(username);
-			}
-			else if(option==7){
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
-				client.readMessage(username);
-			}else if(option==666){
-				client.disconnect();
-			}
 		}
+		//end of 30 min
+		System.out.println("termino por que yo quiero");
 		client.disconnect();
 		
 	}
+	//random option to request
+	private enum requestOption {
+		A,
+		B,
+		C;
+		public static requestOption getRandomRequestOption() {
+            Random random = new Random();
+            return values()[random.nextInt(values().length)];
+        }
+	}
+	//random reciver name
+	private enum recieverName {
+        Pedro,
+        Pepe,
+        Paco,
+        Pato,
+        Patricio,
+        Peter,
+        Pancho,
+        Petra,
+        Phillip,
+        Phin;
+ 
+       
+        public static recieverName getRandomrecieverName() {
+            Random random = new Random();
+            return values()[random.nextInt(values().length)];
+        }
+    }
+	//random queue name
+	private enum queueNameEnum {
+        nomral,
+        high,
+        standar,
+        lower,
+        fisrt,
+        general;
+ 
+        
+        public static queueNameEnum getRandomQueueName() {
+            Random random = new Random();
+            return values()[random.nextInt(values().length)];
+        }
+    }
 	class ServerListener extends Thread {
-
+		ClientMessage msg =new ClientMessage(0);
+		public UUID getMessageUUID(){
+			return msg.getClientMessageID();
+		}
 		public void run() {
 			while(true) {
 				try {
-					ClientMessage msg = (ClientMessage) input.readObject();
+					msg = (ClientMessage) input.readObject();
 					
 					//dependiendo del tipo de mensaje que reciba es la accion
 					int messageType=msg.type;
 					if(messageType==5 || messageType==6 || messageType==7){
 						System.out.println(msg.msg.message);
+						System.out.println(msg.getClientMessageID());
 					}else{
 						System.out.println(msg.getString());
 					}

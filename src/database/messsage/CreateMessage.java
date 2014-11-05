@@ -36,7 +36,7 @@ public class CreateMessage {
 				System.out.println("Something bad during returning id");
 			}
 			int id=result.getInt("id");
-			System.out.println("id is "+id);
+			//System.out.println("id is "+id);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.SEVERE, "Exception in the SQL"+e);

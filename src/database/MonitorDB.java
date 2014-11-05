@@ -10,10 +10,13 @@ import java.util.logging.Logger;
 import Logging.LoggingSet;
 import client.Message;
 import client.QueueCl;
+import database.client.CleanClients;
 import database.client.GetAllClients;
+import database.messsage.CleanMessages;
 import database.messsage.CreateMessage;
 import database.messsage.GetAllMessages;
 import database.messsage.GetMessage;
+import database.queue.CleanQueue;
 import database.queue.CreateQueue;
 import database.queue.GetAllQueues;
 import database.queue.GetQueue;
@@ -39,6 +42,11 @@ public class MonitorDB {
 				logger.log(Level.INFO, "conection to database");
 				System.out.println("conencted!!");
 			}
+			
+			CleanClients.execute_query(conn);
+			CleanMessages.execute_query(conn);
+			CleanQueue.execute_query(conn);
+			/*
 			//CreateQueue.execute_query(testQueue.name, testQueue.queueId.toString(), conn);
 			GetAllQueues.execute_query(conn);
 			
@@ -54,7 +62,7 @@ public class MonitorDB {
 			for(String nameClie : clientName){
 				System.out.println("client "+nameClie);
 			}
-			
+			*/
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

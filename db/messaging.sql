@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.5
--- Started on 2014-11-04 15:35:07 CET
+-- Started on 2014-11-05 13:07:52 CET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,7 +22,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2239 (class 0 OID 0)
+-- TOC entry 2241 (class 0 OID 0)
 -- Dependencies: 178
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
@@ -65,7 +65,7 @@ CREATE SEQUENCE clients_id_seq
 ALTER TABLE public.clients_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2240 (class 0 OID 0)
+-- TOC entry 2242 (class 0 OID 0)
 -- Dependencies: 173
 -- Name: clients_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -89,7 +89,7 @@ CREATE SEQUENCE clients_name_seq
 ALTER TABLE public.clients_name_seq OWNER TO postgres;
 
 --
--- TOC entry 2241 (class 0 OID 0)
+-- TOC entry 2243 (class 0 OID 0)
 -- Dependencies: 174
 -- Name: clients_name_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -132,7 +132,7 @@ CREATE SEQUENCE messages_id_seq
 ALTER TABLE public.messages_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2242 (class 0 OID 0)
+-- TOC entry 2244 (class 0 OID 0)
 -- Dependencies: 170
 -- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -156,7 +156,7 @@ CREATE SEQUENCE "messages_queueID_seq"
 ALTER TABLE public."messages_queueID_seq" OWNER TO postgres;
 
 --
--- TOC entry 2243 (class 0 OID 0)
+-- TOC entry 2245 (class 0 OID 0)
 -- Dependencies: 171
 -- Name: messages_queueID_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -194,7 +194,7 @@ CREATE SEQUENCE queues_id_seq
 ALTER TABLE public.queues_id_seq OWNER TO postgres;
 
 --
--- TOC entry 2244 (class 0 OID 0)
+-- TOC entry 2246 (class 0 OID 0)
 -- Dependencies: 176
 -- Name: queues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -243,23 +243,17 @@ ALTER TABLE ONLY queues ALTER COLUMN id SET DEFAULT nextval('queues_id_seq'::reg
 
 
 --
--- TOC entry 2229 (class 0 OID 16419)
+-- TOC entry 2231 (class 0 OID 16419)
 -- Dependencies: 175
 -- Data for Name: clients; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY clients (id, name) FROM stdin;
-1	pedro
-2	pablo
-3	Anonymous
-7	Perro
-8	Pedro
-9	Pepe
 \.
 
 
 --
--- TOC entry 2245 (class 0 OID 0)
+-- TOC entry 2247 (class 0 OID 0)
 -- Dependencies: 173
 -- Name: clients_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -268,7 +262,7 @@ SELECT pg_catalog.setval('clients_id_seq', 9, true);
 
 
 --
--- TOC entry 2246 (class 0 OID 0)
+-- TOC entry 2248 (class 0 OID 0)
 -- Dependencies: 174
 -- Name: clients_name_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -277,23 +271,17 @@ SELECT pg_catalog.setval('clients_name_seq', 1, false);
 
 
 --
--- TOC entry 2226 (class 0 OID 16405)
+-- TOC entry 2228 (class 0 OID 16405)
 -- Dependencies: 172
 -- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY messages (id, sender, reciever, message, "messageID", "timestamp", "queueID", "clientID") FROM stdin;
-1	kkka	kakak	kakaka	akakak	\N	111	\N
-2				884dab65-fac7-4edd-8daa-297f0689357d	2014-10-21 23:49:57.628	-1	\N
-3	Pedro		lalala	d970f200-eee5-4a1c-8821-b45d4171b7f6	2014-11-04 11:24:14.868	11	8
-4	Pepe		perros perros	c2c31463-819b-41f6-ba6b-b7b34df9125b	2014-11-04 11:25:20.533	11	9
-5	Pedro	Pepe	es para pepe	53ffaa1e-a2ef-4417-99cd-c88fe0e5ea08	2014-11-04 11:25:58.329	13	8
-6	Pepe		lalala	d7f62c39-f305-42bb-9a1b-e5f01c7db1ca	2014-11-04 11:26:36.678	11	9
 \.
 
 
 --
--- TOC entry 2247 (class 0 OID 0)
+-- TOC entry 2249 (class 0 OID 0)
 -- Dependencies: 170
 -- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -302,7 +290,7 @@ SELECT pg_catalog.setval('messages_id_seq', 6, true);
 
 
 --
--- TOC entry 2248 (class 0 OID 0)
+-- TOC entry 2250 (class 0 OID 0)
 -- Dependencies: 171
 -- Name: messages_queueID_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -311,23 +299,17 @@ SELECT pg_catalog.setval('"messages_queueID_seq"', 1, false);
 
 
 --
--- TOC entry 2231 (class 0 OID 16432)
+-- TOC entry 2233 (class 0 OID 16432)
 -- Dependencies: 177
 -- Data for Name: queues; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY queues (id, name, "queueID") FROM stdin;
-1	perro	perro
-2	perro	perro
-3	perro	perro
-11	general	24081d61-7ae8-4aba-a564-5c50114a3a93
-12	general	4dd836ab-75c8-4ee2-8d4a-bd7b5bd4ac94
-13	perros	e22f1a47-40b7-40da-aa53-390d7e361098
 \.
 
 
 --
--- TOC entry 2249 (class 0 OID 0)
+-- TOC entry 2251 (class 0 OID 0)
 -- Dependencies: 176
 -- Name: queues_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -354,7 +336,16 @@ ALTER TABLE ONLY messages
 
 
 --
--- TOC entry 2238 (class 0 OID 0)
+-- TOC entry 2118 (class 2606 OID 24589)
+-- Name: queues_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY queues
+    ADD CONSTRAINT queues_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2240 (class 0 OID 0)
 -- Dependencies: 6
 -- Name: public; Type: ACL; Schema: -; Owner: postgres
 --
@@ -366,7 +357,7 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 GRANT ALL ON SCHEMA public TO message WITH GRANT OPTION;
 
 
--- Completed on 2014-11-04 15:35:07 CET
+-- Completed on 2014-11-05 13:07:52 CET
 
 --
 -- PostgreSQL database dump complete

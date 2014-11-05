@@ -1,60 +1,24 @@
-Oct 23, 2014 1:53:49 AM server.Server <init>
+Nov 05, 2014 8:05:08 PM server.Server <init>
 INFO: Connection to the database made
-Oct 23, 2014 1:53:49 AM server.Server <init>
-INFO: General queue created
-Oct 23, 2014 2:01:06 AM server.Server <init>
-INFO: Connection to the database made
-Oct 24, 2014 1:58:15 PM server.Server <init>
-INFO: Connection to the database made
-Oct 24, 2014 1:58:32 PM server.Server run
+Nov 05, 2014 8:05:17 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
-Oct 24, 2014 2:07:48 PM server.Server$ClientThread run
-SEVERE: Perro Exception reading Streams: java.io.EOFException
-Oct 26, 2014 1:42:05 PM server.Server <init>
-INFO: Connection to the database made
-Oct 26, 2014 1:59:05 PM server.Server <init>
-INFO: Connection to the database made
-Oct 26, 2014 2:09:43 PM server.Server <init>
-INFO: Connection to the database made
-Oct 26, 2014 2:55:45 PM server.Server <init>
-INFO: Connection to the database made
-Oct 26, 2014 4:42:43 PM server.Server <init>
-INFO: Connection to the database made
-Nov 04, 2014 10:27:03 AM server.Server <init>
-INFO: Connection to the database made
-Nov 04, 2014 10:27:39 AM server.Server run
+Nov 05, 2014 8:06:19 PM server.Server$ClientThread run
+SEVERE: Pedro Exception reading Streams: java.net.SocketException: Connection reset
+Nov 05, 2014 8:09:49 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 10:28:22 AM server.Server$ClientThread <init>
-SEVERE: Error drung construction of client handlerjava.io.EOFException
-Nov 04, 2014 10:28:22 AM server.Server$ClientThread run
-SEVERE: null Exception reading Streams: java.io.EOFException
-Nov 04, 2014 11:09:07 AM server.Server <init>
-INFO: Connection to the database made
-Nov 04, 2014 11:09:12 AM server.Server run
+Nov 05, 2014 8:10:51 PM server.Server$ClientThread run
+SEVERE: Pedro Exception reading Streams: java.net.SocketException: Connection reset
+Nov 05, 2014 8:11:11 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 11:09:42 AM server.Server$ClientThread run
-SEVERE: Pedro Exception reading Streams: java.io.EOFException
-Nov 04, 2014 11:09:56 AM server.Server run
+Nov 05, 2014 8:12:14 PM server.Server$ClientThread run
+SEVERE: Pedro Exception reading Streams: java.net.SocketException: Connection reset
+Nov 05, 2014 8:13:19 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 11:10:16 AM server.Server run
+Nov 05, 2014 8:14:21 PM server.Server$ClientThread run
+SEVERE: Pedro Exception reading Streams: java.net.SocketException: Connection reset
+Nov 05, 2014 8:14:33 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 11:23:51 AM server.Server <init>
-INFO: Connection to the database made
-Nov 04, 2014 11:23:55 AM server.Server run
+Nov 05, 2014 8:15:36 PM server.Server$ClientThread run
+SEVERE: Pedro Exception reading Streams: java.net.SocketException: Connection reset
+Nov 05, 2014 8:23:20 PM server.Server run
 INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 11:24:07 AM server.Server run
-INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 11:27:05 AM server.Server$ClientThread run
-SEVERE: Pedro Exception reading Streams: java.io.EOFException
-Nov 04, 2014 11:27:13 AM server.Server$ClientThread run
-SEVERE: Pepe Exception reading Streams: java.io.EOFException
-Nov 04, 2014 11:27:17 AM server.Server run
-INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 11:27:27 AM server.Server run
-INFO: Connection from client accepted 127.0.0.1
-Nov 04, 2014 5:36:53 PM server.Server <init>
-INFO: Connection to the database made
-Nov 04, 2014 5:38:19 PM server.Server <init>
-INFO: Connection to the database made
-Nov 04, 2014 5:41:47 PM server.Server <init>
-INFO: Connection to the database made

@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import controller.Client;
 import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
@@ -29,6 +30,10 @@ public class Server implements Runnable{
 	
 	public static LoggingSet lg=new LoggingSet(Server.class.getName());
 	public static final Logger logger=lg.getLogger();
+	//--for measuring reasons 
+	public static LoggingSet l_measure=new LoggingSet(Server.class.getName()+"-tracing-");
+	public static final Logger log_mes=l_measure.getLogger();
+	//---end
 	
 	private int connectionID;
 	private int port;
@@ -65,8 +70,10 @@ public class Server implements Runnable{
 		poolClients= Executors.newFixedThreadPool(limit);
 		conDispatch.setupDatabaseConnectionPool("postgres", "squirrel", hostDB, "messaging", ConectionDbCapacity);
 		try {
+			log_mes.log(Level.INFO," ConnectingDB \t"+new Date().getTime());
 			conn=conDispatch.getDatabaseConnection();
 			if(!conn.isClosed()){
+				log_mes.log(Level.INFO," ConnectedDB \t"+new Date().getTime());
 				logger.log(Level.INFO, "Connection to the database made");
 				System.out.println("conencted!!");
 				int queueID_temp=GetQueue.execute_query("general", conn);
@@ -99,7 +106,7 @@ public class Server implements Runnable{
 		conn=conDispatch.getDatabaseConnection();
 		
 		try{
-			//System.out.println("LLego aqui"+ this.port);
+			System.out.println("LLego aqui"+ this.port);
 			ServerSocket socket=new ServerSocket(this.port);
 			
 			while(stopCondition){
@@ -251,6 +258,7 @@ public class Server implements Runnable{
 			while(stopCondi){
 				try {
 					ms = (ClientMessage) input.readObject();
+					log_mes.log(Level.INFO,"Request\t"+ms.getType()+"\t"+new Date().getTime());
 				}
 				catch (IOException e) {
 					logger.log(Level.SEVERE, username + " Exception reading Streams: " + e);
@@ -271,23 +279,25 @@ public class Server implements Runnable{
 					int queueID=GetQueue.execute_query("general", dbConn);
 					int clientID=GetClient.execute_query(m.sender, dbConn);
 					CreateMessage.execute_query(m.sender, m.reciever, m.message, m.messageID.toString(), m.timestamp, queueID,clientID, dbConn);
-					answer=new ClientMessage(ClientMessage.sendMessage,"Message sented");
+					answer=new ClientMessage(ClientMessage.sendMessage,"Message sented",ms.getClientMessageID());
 					sendMessage(this.id,answer);
+					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 
 				}else if(ms.getType()==2){
 					System.out.println("Creamos una nueva queue\n");
 					String queueName=ms.getString();
 					if(mapQueue.get(queueName)!=null){
 						System.out.println("Queue exist");
-						answer=new ClientMessage(ClientMessage.createQueue,"Queue existed before");
+						answer=new ClientMessage(ClientMessage.createQueue,"Queue existed before",ms.getClientMessageID());
 						sendMessage(this.id,answer);
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 					}else{
 						mapQueue.put(queueName, new QueueCl(queueName));
 						QueueCl tempQ=mapQueue.get(queueName);
 						CreateQueue.execute_query(queueName, tempQ.queueId.toString(), dbConn);
-						answer=new ClientMessage(ClientMessage.createQueue,"Queue created");
+						answer=new ClientMessage(ClientMessage.createQueue,"Queue created",ms.getClientMessageID());
 						sendMessage(this.id,answer);
-						
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 					}
 				}else if(ms.getType()==3){
 					System.out.println("Borrar queue\n");
@@ -295,17 +305,20 @@ public class Server implements Runnable{
 					if(queueName.equals("general")){
 						QueueCl temp =mapQueue.get(queueName);
 						temp.messages.clear();
-						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted");
+						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted",ms.getClientMessageID());
 						sendMessage(this.id,answer);
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 					}else if(mapQueue.get(queueName)!=null){
 						mapQueue.remove(queueName);
 						System.out.println("Queue removed");
-						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted");
+						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted",ms.getClientMessageID());
 						sendMessage(this.id,answer);
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 					}else{
 						System.out.println("Queue do not exist");
-						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue didn't exist");
+						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue didn't exist",ms.getClientMessageID());
 						sendMessage(this.id,answer);
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 						//mapQueue.put(queueName, new QueueCl());
 					}
 				}else if(ms.getType()==4){
@@ -318,8 +331,9 @@ public class Server implements Runnable{
 						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
 						int clientID=GetClient.execute_query(m2.sender, dbConn);
 						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID,clientID, dbConn);
-						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
+						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent",ms.getClientMessageID());
 						sendMessage(this.id,answer);
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 
 					}else{
 						mapQueue.put(queueName, new QueueCl(queueName));
@@ -332,23 +346,27 @@ public class Server implements Runnable{
 						int clientID=GetClient.execute_query(m2.sender, dbConn);
 						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID,clientID, dbConn);
 						
-						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent");
+						answer=new ClientMessage(ClientMessage.sendPReciever,"Sent",ms.getClientMessageID());
 						sendMessage(this.id,answer);
+						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 					}
 				}else if(ms.getType()==5){
 					String senderName=ms.getString();
 					Message m=findMessageBySender(senderName);
-					answer=new ClientMessage(ClientMessage.querySender,m);
+					answer=new ClientMessage(ClientMessage.querySender,m,ms.getClientMessageID());
 					sendMessage(this.id,answer);
+					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 				}else if(ms.getType()==6){
 					String usrName=ms.getString();
 					Message m=findMessage(usrName);
-					answer=new ClientMessage(ClientMessage.queryQueue,m);
+					answer=new ClientMessage(ClientMessage.queryQueue,m,ms.getClientMessageID());
 					sendMessage(this.id,answer);
+					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 				}else if(ms.getType()==7){
 					Message m=readMessage();
-					answer=new ClientMessage(ClientMessage.readMessage,m);
+					answer=new ClientMessage(ClientMessage.readMessage,m,ms.getClientMessageID());
 					sendMessage(this.id,answer);
+					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 				}
 			}
 			deleteClient(id);
