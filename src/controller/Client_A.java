@@ -243,7 +243,7 @@ public class Client_A {
 						+"diferencia en los";
 				Message mns=new Message(text,username);
 				ClientMessage msg=new ClientMessage(ClientMessage.sendMessage,mns);
-				log_mes.log(Level.INFO,"\t"+option+"\t"+new Date().getTime());
+				log_mes.log(Level.INFO,"\t"+ClientMessage.sendMessage+"\t"+new Date().getTime());
 				client.sendMessage(msg);
 				/*//InputStream in = Client_A.class.getClassLoader().getResourceAsStream("message_A.txt");
 				//BufferedReader br = new BufferedReader(new InputStreamReader(in));
