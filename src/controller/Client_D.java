@@ -7,11 +7,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Date;
 
-import controller.Client_B.ServerListener;
+
 import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
 import database.MonitorDB;
+
+//this client creates messages to general queue for 30 second and then for other 30 second send messages to particular
+//clients in particular queues 
 
 public class Client_D {
 	
@@ -24,6 +27,8 @@ public class Client_D {
 	private ObjectInputStream input;		
 	private ObjectOutputStream output;		
 	private Socket socket;
+	
+	
 	
 	private ServerListener myServer;
 	private static String server, username;
@@ -173,6 +178,9 @@ public class Client_D {
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
+	public void changeAcknow(){
+		this.myServer.aknowledge=1;
+	}
 	public static void main(String[] args) {
 		// default values
 		int portNumber = 10033;
@@ -215,37 +223,67 @@ public class Client_D {
 		
 		//while for 30 min
 		long start = System.currentTimeMillis();
-		long end = start + 60*1000;
-		long half = start + 60*500;
+		long end = start + 600*1000;
+		long half = start + 600*500;
+		long cycle=start+120*1000;
 		while(System.currentTimeMillis() < end){
 			//get sending option
-			
-			String text="";
-			text="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho "
-					+"tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco "
-					+"y galgo corredor. Una olla de algo más vaca que carnero, salpicón las más noches, "
-					+"duelos y quebrantos los sábados, lentejas los viernes, algún palomino de añadidura "
-					+"los domingos, consumían las tres partes de su hacienda. El resto della concluían "
-					+"sayo de velarte, calzas de velludo para las fiestas con sus pantuflos de lo mismo, "
-					+"los días de entre semana se honraba con su vellori de lo más fino. Tenía en su casa "
-					+"una ama que pasaba de los cuarenta, y una sobrina que no llegaba a los veinte, y "
-					+"un mozo de campo y plaza, que así ensillaba el rocín como tomaba la podadera. "
-					+"Frisaba la edad de nuestro hidalgo con los cincuenta años, era de complexión recia," 
-					+"seco de carnes, enjuto de rostro; gran madrugador y amigo de la caza. Quieren "
-					+"decir que tenía el sobrenombre de Quijada o Quesada (que en esto hay alguna "
-					+"diferencia en los";
-				String reciever="";
-				String queueName="";
-				reciever=recieverName.getRandomrecieverName().toString();
-		        queueName=queueNameEnum.getRandomQueueName().toString();
-		        
-		        Message msg2=new Message(text,username,reciever);
-				ClientMessage msg=new ClientMessage(ClientMessage.sendPReciever,msg2,queueName);
-		        log_mes.log(Level.INFO,"\t"+ClientMessage.sendPReciever+"\t"+new Date().getTime());
-				//Message msg2=new Message(text,username,reciever);
-				client.sendMsgQueue(msg);
+			if(System.currentTimeMillis() < cycle){
+				
+			}else{
+				log_mes.log(Level.INFO,"\t"+"cycle"+"\t"+cycle);
+				cycle=cycle+120*1000;
+			}
+			int option=0;
+			//
+			if(System.currentTimeMillis() < half){
+				option=1;
+			}else{
+				option=4;
+			}
+			if(option==1){
+				String text="";
+				text="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidal";
+				Message mns=new Message(text,username);
+				ClientMessage msg=new ClientMessage(ClientMessage.sendMessage,mns);
+				log_mes.log(Level.INFO,"\t"+ClientMessage.sendMessage+"\t"+new Date().getTime());
+				client.sendMessage(msg);
+				UUID mine=msg.getClientMessageID();
+				UUID returned=client.myServer.getMessageUUID();
+				System.out.println("I requested "+mine+" I got "+returned);
+				while(!mine.equals(returned)){
+					System.out.println(returned);
+					returned=client.myServer.getMessageUUID();
+				}
+				System.out.println("I moved on "+mine+" I got "+returned);
+				client.changeAcknow();
+				
+		
+			}else if(option==4){
+				String text="";
+				text="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidal";
+					String reciever="";
+					String queueName="";
+					reciever=recieverName.getRandomrecieverName().toString();
+			        queueName=queueNameEnum.getRandomQueueName().toString();
+			        
+			        Message msg2=new Message(text,username,reciever);
+					ClientMessage msg=new ClientMessage(ClientMessage.sendPReciever,msg2,queueName);
+			        log_mes.log(Level.INFO,"\t"+ClientMessage.sendPReciever+"\t"+new Date().getTime());
+					//Message msg2=new Message(text,username,reciever);
+					client.sendMsgQueue(msg);
+					UUID mine=msg.getClientMessageID();
+					UUID returned=client.myServer.getMessageUUID();
+					System.out.println("I requested "+mine+" I got "+returned);
+					while(!mine.equals(returned)){
+						System.out.println(returned);
+						returned=client.myServer.getMessageUUID();
+					}
+					System.out.println("I moved on "+mine+" I got "+returned);
+					client.changeAcknow();
 							
 				
+			}
 			
 		}
 		//end of 30 min
@@ -289,12 +327,20 @@ public class Client_D {
     }
 	class ServerListener extends Thread {
 		ClientMessage msg =new ClientMessage(0);
+		//this is for answer checking
+		public int aknowledge=0;
+		//
+		public void changeAknowledge(){
+			this.aknowledge=1;
+		}
+		
 		public UUID getMessageUUID(){
 			return msg.getClientMessageID();
 		}
 		public void run() {
 			while(true) {
 				try {
+					this.aknowledge=0;
 					//System.out.println(msg.getClientMessageID());
 					msg = (ClientMessage) input.readObject();
 					
@@ -313,6 +359,10 @@ public class Client_D {
 					//log_mes.info("\t"+messageType+"\t"+new Date().getTime());
 					//System.out.println("Mensaje de tipo "+msg.getType()+"\n");
 					//System.out.print("> ");
+					
+					while(this.aknowledge==0){
+						System.out.println("estoy en limbo");
+					}
 	
 				}
 				catch(IOException e) {

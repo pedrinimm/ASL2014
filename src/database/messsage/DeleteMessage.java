@@ -14,17 +14,20 @@ public class DeleteMessage {
 	public static final Logger logger=lg.getLogger();
 	public final static String QUERY_DELETE_MESSAGE="DELETE from messages WHERE \"messageID\"=?";
 	
-	public static void execute_query(String messageID,Connection con){
+	public synchronized static void execute_query(String messageID,Connection con){
 		PreparedStatement stmn=null;
 		
 		try {
 			stmn=con.prepareStatement(QUERY_DELETE_MESSAGE);
 			stmn.setString(1, messageID);
-			ResultSet result=stmn.executeQuery();
-			if(!result.next()){
-				logger.log(Level.SEVERE, "Error during comming back after returning a message");
-				System.out.println("Something bad during returning id");
-			}
+			int rowsDeleted = stmn.executeUpdate();
+			System.out.println(rowsDeleted + " rows deleted"); 
+			stmn.close();
+//			ResultSet result=stmn.executeQuery();
+//			if(!result.next()){
+//				logger.log(Level.SEVERE, "Error during comming back after returning a message");
+//				System.out.println("Something bad during returning id");
+//			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.SEVERE, "Exception in the SQL"+e);

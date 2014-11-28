@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Date;
 
-
 import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
@@ -174,6 +173,9 @@ public class Client_B {
 			System.out.println("Exception writing to server: " + e);
 		}
 	}
+	public void changeAcknow(){
+		this.myServer.aknowledge=1;
+	}
 	public static void main(String[] args) {
 		// default values
 		int portNumber = 10033;
@@ -216,43 +218,64 @@ public class Client_B {
 		
 		//while for 30 min
 		long start = System.currentTimeMillis();
-		long end = start + 60*1000;
-		long half = start + 60*500;
+		long end = start + 1800*1000;
+		long half = start + 1800*500;
+		long cycle=start+120*1000;
 		while(System.currentTimeMillis() < end){
 			//get sending option
+			if(System.currentTimeMillis() < cycle){
+				
+			}else{
+				log_mes.log(Level.INFO,"\t"+"cycle"+"\t"+cycle);
+				cycle=cycle+120*1000;
+			}
 			String option=requestOption.getRandomRequestOption().toString();
 			//
 			
 			if(option.equals("A")){
 				String sender=recieverName.getRandomrecieverName().toString();
-				log_mes.log(Level.INFO,"\t"+ClientMessage.querySender+"\t"+new Date().getTime());
 				ClientMessage msg=new ClientMessage(ClientMessage.querySender,sender);
+				log_mes.log(Level.INFO,"\t"+ClientMessage.querySender+"\t"+new Date().getTime()+"\t"+msg.getClientMessageID());
 				client.getMsgSender(msg);
-				//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
-				//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
-					//System.out.println(client.myServer.getMessageUUID());
-				//}
-				//System.out.println("I moved on "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+				UUID mine=msg.getClientMessageID();
+				UUID returned=client.myServer.getMessageUUID();
+				System.out.println("I requested "+mine+" I got "+returned);
+				while(!mine.equals(returned)){
+					System.out.println(returned);
+					returned=client.myServer.getMessageUUID();
+				}
+				System.out.println("I moved on "+mine+" I got "+returned);
+				client.changeAcknow();
+				
 			}
 			if(option.equals("B")){
-				log_mes.log(Level.INFO,"\t"+ClientMessage.queryQueue+"\t"+new Date().getTime());
 				ClientMessage msg=new ClientMessage(ClientMessage.queryQueue,username);
+				log_mes.log(Level.INFO,"\t"+ClientMessage.queryQueue+"\t"+new Date().getTime()+"\t"+msg.getClientMessageID());
 				client.readMessageAnyqueue(msg);
-				//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
-				//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
-					//System.out.println(client.myServer.getMessageUUID());
-				//}
-				//System.out.println("I moved on "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+				UUID mine=msg.getClientMessageID();
+				UUID returned=client.myServer.getMessageUUID();
+				System.out.println("I requested "+mine+" I got "+returned);
+				while(!mine.equals(returned)){
+					System.out.println(returned);
+					returned=client.myServer.getMessageUUID();
+				}
+				System.out.println("I moved on "+mine+" I got "+returned);
+				client.changeAcknow();
+				
 			}
 			if(option.equals("C")){
-				log_mes.log(Level.INFO,"\t"+ClientMessage.readMessage+"\t"+new Date().getTime());
 				ClientMessage msg=new ClientMessage(ClientMessage.readMessage,username);
+				log_mes.log(Level.INFO,"\t"+ClientMessage.readMessage+"\t"+new Date().getTime()+"\t"+msg.getClientMessageID());
 				client.readMessage(msg);
-				//System.out.println("I requested "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
-				//while(!client.myServer.getMessageUUID().equals(msg.getClientMessageID())){
-					//System.out.println(client.myServer.getMessageUUID());
-				//}
-				//System.out.println("I moved on "+msg.getClientMessageID()+" I got "+client.myServer.getMessageUUID());
+				UUID mine=msg.getClientMessageID();
+				UUID returned=client.myServer.getMessageUUID();
+				System.out.println("I requested "+mine+" I got "+returned);
+				while(!mine.equals(returned)){
+					System.out.println(returned);
+					returned=client.myServer.getMessageUUID();
+				}
+				System.out.println("I moved on "+mine+" I got "+returned);
+				client.changeAcknow();
 			}
 			
 		}
@@ -307,26 +330,43 @@ public class Client_B {
     }
 	class ServerListener extends Thread {
 		ClientMessage msg =new ClientMessage(0);
+		//this is for answer checking
+		public int aknowledge=0;
+		//
+		public void changeAknowledge(){
+			this.aknowledge=1;
+		}
+		
 		public UUID getMessageUUID(){
 			return msg.getClientMessageID();
 		}
 		public void run() {
 			while(true) {
 				try {
+//					this.aknowledge=0;
+					//System.out.println(msg.getClientMessageID());
 					msg = (ClientMessage) input.readObject();
-					
-					//dependiendo del tipo de mensaje que reciba es la accion
 					int messageType=msg.type;
+					log_mes.log(Level.INFO,"\t"+messageType+"\t"+new Date().getTime()+"\t"+msg.getClientMessageID());
+					//dependiendo del tipo de mensaje que reciba es la accion
+					
 					if(messageType==5 || messageType==6 || messageType==7){
 						System.out.println(msg.msg.message);
 						System.out.println(msg.getClientMessageID());
+
 					}else{
 						System.out.println(msg.getString());
+						System.out.println(msg.getClientMessageID());
+
 					}
-					log_mes.log(Level.INFO,"\t"+messageType+"\t"+new Date().getTime());
+					
 					//log_mes.info("\t"+messageType+"\t"+new Date().getTime());
 					//System.out.println("Mensaje de tipo "+msg.getType()+"\n");
 					//System.out.print("> ");
+					
+//					while(this.aknowledge==0){
+//						System.out.println("estoy en limbo");
+//					}
 	
 				}
 				catch(IOException e) {

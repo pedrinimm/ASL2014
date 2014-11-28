@@ -19,7 +19,7 @@ public class GetMessage {
 	public static final Logger logger=lg.getLogger();
 	public final static String QUERY_FETCH_MESSAGE="SELECT * from messages WHERE \"messageID\"=?";
 	
-	public static Message execute_query(String messageID,Connection con){
+	public synchronized static Message execute_query(String messageID,Connection con){
 		PreparedStatement stmn=null;
 		Message msg=new Message();
 		try {

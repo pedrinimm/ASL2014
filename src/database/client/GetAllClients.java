@@ -16,7 +16,7 @@ public class GetAllClients {
 	public final static String QUERY_FETCH_CLIENTS="SELECT * from clients";
 	public static LinkedList<String> clientName;
 	
-	public static LinkedList<String> execute_query(Connection con){
+	public synchronized static LinkedList<String> execute_query(Connection con){
 		clientName=new LinkedList<String>();
 		PreparedStatement stmn=null;
 		String name="";

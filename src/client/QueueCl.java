@@ -1,7 +1,10 @@
 package client;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 
 public class QueueCl implements Serializable{
 	
@@ -17,6 +20,11 @@ public class QueueCl implements Serializable{
 	public QueueCl(String queueName){
 		this.name=queueName;
 		this.queueId=UUID.randomUUID();
+		this.messages=new LinkedList<Message>();
+	}
+	public QueueCl(String queueName,String queueID){
+		this.name=queueName;
+		this.queueId=UUID.fromString(queueID);
 		this.messages=new LinkedList<Message>();
 	}
 	public void insertMessage(Message newMessage){

@@ -17,7 +17,7 @@ public class CreateQueue {
 	public final static String QUERY_INSERT_QUEUE="INSERT INTO queues (name,\"queueID\") "
 			+ "VALUES (?,?) returning id ";
 	
-	public static void execute_query(String name,String queueID,Connection con){
+	public synchronized static void execute_query(String name,String queueID,Connection con){
 		PreparedStatement stmn=null;
 		
 		try {

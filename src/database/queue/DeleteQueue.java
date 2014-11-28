@@ -15,18 +15,21 @@ public class DeleteQueue {
 	
 	public final static String QUERY_DELETE_QUEUE="DELETE from queues WHERE name=? AND \"queueID\"=?";
 	
-	public static void execute_query(String name,String queueID,Connection con){
+	public synchronized static void execute_query(String name,String queueID,Connection con){
 		PreparedStatement stmn=null;
 		
 		try {
 			stmn=con.prepareStatement(QUERY_DELETE_QUEUE);
 			stmn.setString(1, name);
 			stmn.setString(2, queueID);
-			ResultSet result=stmn.executeQuery();
-			if(!result.next()){
-				logger.log(Level.WARNING, "Error during comming back after deleting a queue");
-				System.out.println("Something bad during returning id");
-			}
+			//ResultSet result=stmn.executeQuery();
+			int rowsDeleted = stmn.executeUpdate();
+			System.out.println(rowsDeleted + " rows deleted"); 
+			stmn.close();
+//			if(!result.next()){
+//				logger.log(Level.WARNING, "Error during comming back after deleting a queue");
+//				System.out.println("Something bad during returning id");
+//			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.SEVERE, "Error closing statement"+e);

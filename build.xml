@@ -1,4 +1,4 @@
-<project name="Messaging" default="dist" basedir=".">
+<project name="Messaging" default="jar" basedir=".">
 	
     <description>
         System
@@ -10,18 +10,11 @@
 	<property name="lib"  location="lib"/>
 	<property name="db"  location="db"/>
 	<property name="jar"  location="jar"/>
+	<property name="classes"  location="${build}/classes/"/>
 
 	<!--
 	    Create a classpath container which can be later used in the ant task
 	  -->
-  	<path id="build.classpath">
-  		 <pathelement location="classes"/>
-  		 <pathelement location="lib/postgresql-9.3-1102.jdbc4.jar"/>
-	    <fileset dir="${lib}">
-	    	<include name="lib/postgresql-9.3-1102.jdbc4.jar"/>
-	      	<include name="**/*.jar" />
-	    </fileset>
-  	</path>
 
   	<target name="init">
     	<!-- Create the time stamp -->
@@ -32,47 +25,65 @@
 
 	<target name="compile" depends="init" description="compile the source" >
     	<!-- Compile the java code from ${src} into ${build} -->
-    	<javac srcdir="${src}" destdir="${build}" classpathref="build.classpath" includeantruntime="false" encoding="utf-8" >
+    	<javac srcdir="${src}" destdir="${classes}" includeantruntime="false" encoding="utf-8" debug="true">
     		<classpath>
     			<fileset dir="${lib}">
-    				    	<include name="postgresql-9.3-1102.jdbc4.jar"/>
     				      	<include name="**/*.jar" />
     			</fileset>
-    		    <path id="postgresql" location="${lib.dir}/postgresql-9.3-1102.jdbc4.jar"/>
     		</classpath>
     	</javac>
 	</target>
 
-  	<target name="dist" depends="compile" description="generate the distribution" >
-    	<manifestclasspath property="jar.classpath" jarfile="${dist}/lib/MyMessaging-mpedro-${DSTAMP}.jar">
-    		    <classpath refid="build.classpath"/>
-    	</manifestclasspath>
-    	<!-- Create the distribution directory -->
-    	<mkdir dir="${dist}/lib"/>
-    	<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-  		<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
-    	<jar jarfile="${dist}/lib/MyMessaging-mpedro-${DSTAMP}.jar" basedir="${build}">
-    		<manifest>
-    			<attribute name="Class-Path" value="${jar.classpath}" />
-    		</manifest>
-    		<zipgroupfileset dir="${lib}" includes="**/*.jar"/>
-  		</jar>
-  	</target>
-	
 	<target name="jar" depends="compile">
-  		<manifestclasspath property="jar.classpath" jarfile="${dist}/jar/${ant.project.name}.jar">
-  			     <classpath refid="build.classpath"/>
-  		</manifestclasspath>	
-		<mkdir dir="${dist}/jar"/>
-		<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
-	    <jar destfile="${dist}/jar/${ant.project.name}.jar" basedir="${build}">
-	        <manifest>
-	    		<attribute name="Class-Path" value="${jar.classpath}" />
-	        </manifest>
-	        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
-	    </jar>
+				<mkdir dir="${dist}/jar"/>
+				<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
+			    <jar destfile="${dist}/jar/${ant.project.name}.jar" basedir="${classes}">
+			        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+			    </jar>
 
 	</target>
+	<target name="server" depends="compile">
+			<mkdir dir="${dist}/jar"/>
+			<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
+		    <jar destfile="${dist}/jar/server-${ant.project.name}.jar" basedir="${classes}">
+		        <manifest>
+		        	<attribute name="Main-Class" value="server.Server" />
+		        </manifest>
+		        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+		    </jar>
+
+	</target>
+	<target name="client_b" depends="compile">
+			<mkdir dir="${dist}/jar"/>
+			<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
+		    <jar destfile="${dist}/jar/client_b-${ant.project.name}.jar" basedir="${classes}">
+		        <manifest>
+		        	<attribute name="Main-Class" value="controller.Client_B" />
+		        </manifest>
+		        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+		    </jar>
+
+	</target>
+	<target name="client_e" depends="compile">
+				<mkdir dir="${dist}/jar"/>
+				<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
+			    <jar destfile="${dist}/jar/client_e-${ant.project.name}.jar" basedir="${classes}">
+			        <manifest>
+			        	<attribute name="Main-Class" value="controller.Client_E" />
+			        </manifest>
+			        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+			    </jar>
+	</target>
+	<target name="client" depends="compile">
+					<mkdir dir="${dist}/jar"/>
+					<zipfileset includes="**/*.class" src="lib/postgresql-9.3-1102.jdbc4.jar"/>
+				    <jar destfile="${dist}/jar/client-${ant.project.name}.jar" basedir="${classes}">
+				        <manifest>
+				        	<attribute name="Main-Class" value="controller.Client" />
+				        </manifest>
+				        <zipgroupfileset dir="${lib}" includes="**/*.jar"/>
+				    </jar>
+		</target>
 
   	<target name="clean" description="clean up" >
     	<!-- Delete the ${build} and ${dist} directory trees -->

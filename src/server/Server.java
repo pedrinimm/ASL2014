@@ -12,7 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import Logging.LoggingSet;
 import client.ClientMessage;
 import client.Message;
@@ -20,7 +19,11 @@ import client.QueueCl;
 import database.client.CreateClient;
 import database.client.GetClient;
 import database.messsage.CreateMessage;
+import database.messsage.DeleteMessage;
+import database.messsage.GetAllMessagesToQueue;
+import database.queue.CleanGeneralQueue;
 import database.queue.CreateQueue;
+import database.queue.DeleteQueue;
 import database.queue.GetQueue;
 
 
@@ -81,6 +84,7 @@ public class Server implements Runnable{
 					System.out.println("General queue created");
 					logger.log(Level.INFO, "General queue created");
 				}else{
+					this.mapQueue=GetAllMessagesToQueue.execute_query(conn);
 					System.out.println("Queue in database "+queueID_temp);
 				}
 			}
@@ -107,7 +111,7 @@ public class Server implements Runnable{
 		try{
 			System.out.println("LLego aqui "+ this.port);
 			ServerSocket socket=new ServerSocket(this.port);
-			//System.out.println("LLego aqui"+ this.port);
+			System.out.println("LLego aqui"+ this.port);
 			while(stopCondition){
 				System.out.println("Server waiting for Clients on port " + port + ".");
 				Socket connection= socket.accept();
@@ -303,12 +307,23 @@ public class Server implements Runnable{
 					String queueName=ms.getString();
 					if(queueName.equals("general")){
 						QueueCl temp =mapQueue.get(queueName);
+						//nueva implementacion
+						int queueID=GetQueue.execute_query("general", dbConn);
+						CleanGeneralQueue.execute_query(queueID, dbConn);
+						//
 						temp.messages.clear();
 						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted",ms.getClientMessageID());
 						sendMessage(this.id,answer);
 						log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 					}else if(mapQueue.get(queueName)!=null){
+						//nueva implementacion
+						QueueCl temp =mapQueue.get(queueName);
+						int queueID=GetQueue.execute_query(queueName, dbConn);
+						CleanGeneralQueue.execute_query(queueID, dbConn);
+						DeleteQueue.execute_query(temp.name, temp.queueId.toString(), dbConn);
+						//
 						mapQueue.remove(queueName);
+						
 						System.out.println("Queue removed");
 						answer=new ClientMessage(ClientMessage.deleteQueue,"Queue Deleted",ms.getClientMessageID());
 						sendMessage(this.id,answer);
@@ -326,7 +341,6 @@ public class Server implements Runnable{
 					if(mapQueue.get(queueName)!=null){
 						mapQueue.get(queueName).insertMessage(m2);
 						QueueCl tempQ=mapQueue.get(queueName);
-						//int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
 						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
 						int clientID=GetClient.execute_query(m2.sender, dbConn);
 						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID,clientID, dbConn);
@@ -337,10 +351,8 @@ public class Server implements Runnable{
 					}else{
 						mapQueue.put(queueName, new QueueCl(queueName));
 						mapQueue.get(queueName).insertMessage(m2);
-						
 						QueueCl tempQ=mapQueue.get(queueName);
 						CreateQueue.execute_query(queueName, tempQ.queueId.toString(), dbConn);
-						//int queueID=GetQueue.execute_query(tempQ.getName(), tempQ.queueId.toString(), dbConn);
 						int queueID=GetQueue.execute_query(tempQ.getName(), dbConn);
 						int clientID=GetClient.execute_query(m2.sender, dbConn);
 						CreateMessage.execute_query(m2.sender, m2.reciever, m2.message, m2.messageID.toString(), m2.timestamp, queueID,clientID, dbConn);
@@ -352,17 +364,26 @@ public class Server implements Runnable{
 				}else if(ms.getType()==5){
 					String senderName=ms.getString();
 					Message m=findMessageBySender(senderName);
+					//nuevo
+					DeleteMessage.execute_query(m.messageID.toString(), dbConn);
+					//
 					answer=new ClientMessage(ClientMessage.querySender,m,ms.getClientMessageID());
 					sendMessage(this.id,answer);
 					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 				}else if(ms.getType()==6){
 					String usrName=ms.getString();
 					Message m=findMessage(usrName);
+					//nuevo
+					DeleteMessage.execute_query(m.messageID.toString(), dbConn);
+					//
 					answer=new ClientMessage(ClientMessage.queryQueue,m,ms.getClientMessageID());
 					sendMessage(this.id,answer);
 					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());
 				}else if(ms.getType()==7){
 					Message m=readMessage();
+					//nuevo
+					DeleteMessage.execute_query(m.messageID.toString(), dbConn);
+					//
 					answer=new ClientMessage(ClientMessage.readMessage,m,ms.getClientMessageID());
 					sendMessage(this.id,answer);
 					log_mes.log(Level.INFO,"Done\t"+ms.getType()+"\t"+new Date().getTime());

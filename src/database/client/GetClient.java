@@ -15,7 +15,7 @@ public class GetClient {
 	public static final Logger logger=lg.getLogger();
 	public final static String QUERY_FETCH_CLIENT="SELECT * from clients WHERE name=? ";//AND \"queueID\"=?";
 	
-	public static int execute_query(String name,Connection con){
+	public synchronized static int execute_query(String name,Connection con){
 		PreparedStatement stmn=null;
 		int id=-1;
 		try {

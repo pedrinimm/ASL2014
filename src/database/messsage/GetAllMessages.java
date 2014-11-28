@@ -14,7 +14,7 @@ public class GetAllMessages {
 
 	public final static String QUERY_FETCH_CLIENTS="SELECT * from messages";
 	
-	public static void execute_query(Connection con){
+	public synchronized void  execute_query(Connection con){
 		PreparedStatement stmn=null;
 		Message msg=new Message();
 		try {

@@ -16,7 +16,7 @@ public class CreateClient {
 	private static final String myQuery= "INSERT INTO clients (name) VALUES (?) returning id";
 	
 
-	public static void execute_query(String name,Connection con){
+	public synchronized static void execute_query(String name,Connection con){
 		PreparedStatement stmt = null;
         try {
             stmt = con.prepareStatement(myQuery);
